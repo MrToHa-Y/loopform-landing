@@ -88,7 +88,7 @@ export const useScrollStore = create<ScrollState>((set) => ({
     model: "tolqyn",
     color: "cap-red",
     height: "dining",
-    texture: "smooth",
+    texture: "relief",
     cushion: "none",
     angle: 0,
   },

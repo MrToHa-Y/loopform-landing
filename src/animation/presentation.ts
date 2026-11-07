@@ -74,7 +74,7 @@ export function buildFrames() {
     ids.forEach((id) => add(id, sectionTop(id)))
   }
 
-  const tail: SectionId[] = ["configurator", "manifesto", "business", "market", "faq", "cta"]
+  const tail: SectionId[] = ["configurator", "manifesto", "philosophy", "advantages", "business", "market", "competition", "faq", "cta"]
   tail.forEach((id) => add(id, sectionTop(id)))
 
   frames.push({

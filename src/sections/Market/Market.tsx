@@ -55,7 +55,7 @@ export function Market() {
     <StackSection
       id="market"
       theme="light"
-      label={ru.sections[11]?.title ?? ""}
+      label={ru.sections[13]?.title ?? ""}
       sectionRef={sectionRef}
       className={styles.root}
     >

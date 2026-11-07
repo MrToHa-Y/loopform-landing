@@ -1,4 +1,4 @@
-import { Color, DoubleSide, MeshDepthMaterial, MeshPhysicalMaterial, MeshStandardMaterial, RGBADepthPacking } from "three"
+import { Color, DoubleSide, MeshDepthMaterial, MeshStandardMaterial, RGBADepthPacking } from "three"
 import type { IUniform } from "three"
 import printClip from "./printClip.glsl?raw"
 import printColor from "./printColor.glsl?raw"
@@ -8,8 +8,6 @@ import printNormal from "./printNormal.glsl?raw"
 import printRoughness from "./printRoughness.glsl?raw"
 import printVertexMain from "./printVertexMain.glsl?raw"
 import printVertexPars from "./printVertexPars.glsl?raw"
-
-export const defaultLayerHeight = 0.0016
 
 export interface PrintUniforms {
   uProgress: IUniform<number>
@@ -22,12 +20,19 @@ export interface PrintUniforms {
   uBaseColor: IUniform<Color>
   uSpeckle: IUniform<Color[]>
   uSpeckleAmount: IUniform<number>
+  uSpeckleScale: IUniform<number>
   uRelief: IUniform<number>
   uRoughMin: IUniform<number>
   uRoughMax: IUniform<number>
   uTime: IUniform<number>
   uLegStretch: IUniform<number>
   uSeatY: IUniform<number>
+  uClipFloor: IUniform<number>
+  uGrain: IUniform<number>
+  uGlow: IUniform<number>
+  uGlowColor: IUniform<Color>
+  uGlowY: IUniform<number>
+  uGlowSpan: IUniform<number>
 }
 
 export interface PrintOptions {
@@ -35,10 +40,13 @@ export interface PrintOptions {
   speckle: [Color, Color, Color]
   edgeColor: Color
   speckleAmount?: number
+  speckleScale?: number
+  layerHeight?: number
   roughMin?: number
   roughMax?: number
   relief?: number
-  translucent?: boolean
+  grain?: boolean
+  glow?: { color: Color; intensity: number; y: number; span: number }
 }
 
 export interface PrintBundle {
@@ -59,23 +67,28 @@ export function createPrintMaterial(options: PrintOptions): PrintBundle {
     uDirection: { value: 1 },
     uMinY: { value: 0 },
     uMaxY: { value: 1 },
-    uLayerHeight: { value: defaultLayerHeight },
+    uLayerHeight: { value: options.layerHeight ?? 0.0125 },
     uEdgeColor: { value: options.edgeColor.clone() },
     uEdgeWidth: { value: 0.012 },
     uBaseColor: { value: options.color.clone() },
     uSpeckle: { value: options.speckle.map((color) => color.clone()) },
     uSpeckleAmount: { value: options.speckleAmount ?? 0.035 },
+    uSpeckleScale: { value: options.speckleScale ?? 140 },
     uRelief: { value: options.relief ?? 1 },
     uRoughMin: { value: options.roughMin ?? 0.55 },
     uRoughMax: { value: options.roughMax ?? 0.8 },
     uTime: { value: 0 },
     uLegStretch: { value: 1 },
     uSeatY: { value: 0.45 },
+    uClipFloor: { value: 0 },
+    uGrain: { value: options.grain ? 1 : 0 },
+    uGlow: { value: options.glow?.intensity ?? 0 },
+    uGlowColor: { value: options.glow?.color.clone() ?? new Color() },
+    uGlowY: { value: options.glow?.y ?? 0 },
+    uGlowSpan: { value: options.glow?.span ?? 1 },
   }
 
-  const material = options.translucent
-    ? new MeshPhysicalMaterial({ transmission: 0.6, thickness: 0.3, roughness: 0.35, side: DoubleSide })
-    : new MeshStandardMaterial({ side: DoubleSide })
+  const material = new MeshStandardMaterial({ side: DoubleSide })
 
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms)
@@ -89,7 +102,7 @@ export function createPrintMaterial(options: PrintOptions): PrintBundle {
       .replace("#include <emissivemap_fragment>", printEmissive)
   }
 
-  material.customProgramCacheKey = () => (options.translucent ? "print-physical" : "print-standard")
+  material.customProgramCacheKey = () => "print-standard"
 
   const depthMaterial = new MeshDepthMaterial({ depthPacking: RGBADepthPacking })
 
@@ -97,7 +110,7 @@ export function createPrintMaterial(options: PrintOptions): PrintBundle {
     Object.assign(shader.uniforms, uniforms)
     shader.vertexShader = injectVertex(shader.vertexShader)
     shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", "#include <common>\nuniform float uProgress;\nuniform float uMinY;\nuniform float uMaxY;\nvarying vec3 vObjPos;\nvarying vec3 vUpView;")
+      .replace("#include <common>", "#include <common>\nuniform float uProgress;\nuniform float uMinY;\nuniform float uMaxY;\nvarying vec3 vObjPos;\nvarying vec3 vUpView;\nvarying float vLayer;")
       .replace(
         "#include <clipping_planes_fragment>",
         "#include <clipping_planes_fragment>\nif (vObjPos.y > mix(uMinY, uMaxY, uProgress)) discard;",

@@ -163,6 +163,36 @@ try {
     const decoded = Buffer.from(configurator.link.split("start=")[1], "base64url").toString()
     report("configurator recalculates and builds link", configurator.price === "75 700 ₸" && decoded === "tolqyn.terrazzo.bar.relief.felt.135", `${configurator.price} ${decoded}`)
 
+    const pageText = await page.evaluate(() => document.body.textContent)
+    report("images carry no AI caption", !pageText.includes("Изображение создано ИИ"))
+
+    const frames = await page.evaluate(() =>
+      [...document.querySelectorAll("[data-section='process'] figure")].map((node) => {
+        const box = node.getBoundingClientRect()
+
+        return `${Math.round(box.width)}x${Math.round(box.height)}`
+      }),
+    )
+    report("process steps share one layout", frames.length === 5 && new Set(frames).size === 1, frames.join(" "))
+
+    const missing = await page.evaluate(async () => {
+      const sources = [...document.querySelectorAll("[data-section='catalog'] img, [data-section='process'] img")].map((node) => node.src)
+      const answers = await Promise.all(sources.filter((source) => !source.startsWith("blob:")).map((source) => fetch(source).then((response) => response.ok)))
+
+      return { total: answers.length, failed: answers.filter((value) => !value).length }
+    })
+    report("catalog and process photos load", missing.total >= 13 && missing.failed === 0, JSON.stringify(missing))
+
+    const added = await page.evaluate(() => ["philosophy", "advantages", "competition"].every((id) => document.querySelector(`[data-section='${id}']`)?.textContent.length > 200))
+    report("business text sections are on the page", added)
+    const tiles = await page.evaluate(() =>
+      [...document.querySelectorAll("[data-section='configurator'] button[aria-pressed] img")].map((node) => {
+        const box = node.parentElement.getBoundingClientRect()
+
+        return `${Math.round(box.width)}x${Math.round(box.height)}`
+      }),
+    )
+    report("configurator model tiles share one size", tiles.length === 10 && new Set(tiles).size === 1 && tiles[0].split("x")[0] === tiles[0].split("x")[1], [...new Set(tiles)].join(" "))
     report("no console errors on desktop", errors.length === 0, errors.slice(0, 3).join(" | "))
     await context.close()
   }
@@ -183,7 +213,7 @@ try {
       await page.waitForTimeout(150)
 
       const position = await page.evaluate(() => Math.round(window.scrollY))
-      const counter = await page.evaluate(() => [...document.querySelectorAll("p")].map((node) => node.textContent).find((text) => /^\d\d \/ 15$/.test(text ?? "")))
+      const counter = await page.evaluate(() => [...document.querySelectorAll("p")].map((node) => node.textContent).find((text) => /^\d\d \/ 18$/.test(text ?? "")))
 
       seen.push(counter)
 

@@ -92,7 +92,12 @@ export function Configurator() {
       ease: eases.inOut,
       overwrite: true,
       onComplete: () => {
-        setConfigurator({ model: id, height: "dining", cushion: "none" })
+        setConfigurator({
+          model: id,
+          color: configurator.models.find((item) => item.id === id)?.color ?? "cap-red",
+          height: "dining",
+          cushion: "none",
+        })
         resetView()
         gsap.to(configuratorRig, { print: 1, duration: durations.print, ease: eases.out })
       },

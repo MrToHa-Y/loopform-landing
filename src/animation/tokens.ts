@@ -56,9 +56,10 @@ export const sectionHeights = {
   process: 400,
   passport: 300,
   configurator: 200,
-  manifesto: 250,
+  manifesto: 320,
   business: 100,
   market: 100,
+  philosophy: 120,
 } as const
 
 export const segments = {
@@ -103,9 +104,6 @@ export const segments = {
   manifesto: {
     manifestoLines: [-100, 150],
     manifestoPhoto: [0, 80],
-  },
-  business: {
-    businessSeam: [-100, 60],
   },
   footer: {
     footerEnter: [-100, 0],

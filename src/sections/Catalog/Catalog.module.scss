@@ -107,19 +107,6 @@
   }
 }
 
-.aiNote {
-  position: absolute;
-  top: var(--space-2xs);
-  left: var(--space-2xs);
-  padding: var(--space-3xs) var(--space-2xs);
-  font-family: var(--font-mono);
-  font-size: var(--text-source);
-  color: var(--color-bone);
-  pointer-events: none;
-  background-color: var(--color-graphite);
-  border-radius: var(--radius-sm);
-}
-
 .caption {
   display: flex;
   flex-direction: column;

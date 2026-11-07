@@ -18,8 +18,11 @@ export type SectionId =
   | "passport"
   | "configurator"
   | "manifesto"
+  | "philosophy"
+  | "advantages"
   | "business"
   | "market"
+  | "competition"
   | "faq"
   | "cta"
   | "footer"
@@ -37,7 +40,7 @@ export type CatalogModelId =
 
 export type ThemeName = "light" | "dark" | "accent"
 
-export type ConfiguratorColorId = "cap-red" | "bottle-green" | "sand" | "cap-blue" | "terrazzo"
+export type ConfiguratorColorId = "cap-red" | "bottle-green" | "sand" | "cap-blue" | "sun" | "terrazzo"
 
 export type ConfiguratorHeightId = "dining" | "bar"
 
@@ -87,7 +90,6 @@ export interface Brand {
     kz: string[]
   }
   colors: BrandColor[]
-  aiImageNote: string
   badge: string
   monogram: string
 }
@@ -170,7 +172,6 @@ export interface ProcessStep {
   title: string
   text: string
   photo?: ProcessPhoto
-  inset?: ProcessPhoto
 }
 
 export interface Process {
@@ -222,6 +223,7 @@ export interface ConfiguratorModel {
   pricePrefix: string
   weightKg: number
   fromCaps: boolean
+  color: ConfiguratorColorId
   adjustable: boolean
 }
 
@@ -268,7 +270,6 @@ export interface Manifesto {
   lines: string[]
   imagePath: string
   imageAlt: string
-  imageCaption: string
   pilotCall: string
 }
 
@@ -406,6 +407,55 @@ export interface Presentation {
   railLabel: string
 }
 
+export interface TextItem {
+  title: string
+  text: string
+}
+
+export interface PhilosophyContent {
+  eyebrow: string
+  title: string
+  lead: string
+  paragraphs: string[]
+  principles: TextItem[]
+}
+
+export interface AdvantagesContent {
+  eyebrow: string
+  title: string
+  items: TextItem[]
+}
+
+export interface SourceLink {
+  label: string
+  url: string
+}
+
+export interface CompetitorRow {
+  name: string
+  place: string
+  fact: string
+  answer: string
+  source: SourceLink
+}
+
+export interface DemandFigure {
+  value: string
+  label: string
+  source: SourceLink
+}
+
+export interface CompetitionContent {
+  eyebrow: string
+  title: string
+  lead: string
+  columns: { name: string; fact: string; answer: string }
+  rows: CompetitorRow[]
+  note: string
+  demandTitle: string
+  demand: DemandFigure[]
+}
+
 export interface Content {
   brand: Brand
   sections: SectionEntry[]
@@ -421,7 +471,10 @@ export interface Content {
   passport: Passport
   configurator: Configurator
   manifesto: Manifesto
+  philosophy: PhilosophyContent
+  advantages: AdvantagesContent
   business: Business
+  competition: CompetitionContent
   market: Market
   faq: Faq
   cta: Cta

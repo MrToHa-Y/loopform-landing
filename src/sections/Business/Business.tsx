@@ -2,7 +2,6 @@ import { useRef } from "react"
 import { Flip, ScrollTrigger, gsap, useGSAP } from "@/animation/gsap"
 import { scrollToSection } from "@/animation/lenis"
 import { durations, eases, sectionHeights, staggers } from "@/animation/tokens"
-import { useSectionProgress } from "@/animation/useSectionProgress"
 import { MagneticButton } from "@/components/MagneticButton/MagneticButton"
 import { SplitLines } from "@/components/SplitLines/SplitLines"
 import { StackSection } from "@/components/StackSection/StackSection"
@@ -17,8 +16,6 @@ export function Business() {
   const reducedMotion = useScrollStore((state) => state.reducedMotion)
   const compact = useScrollStore((state) => state.compact)
   const { business } = ru
-
-  useSectionProgress(sectionRef, "business")
 
   useGSAP(
     () => {
@@ -74,12 +71,10 @@ export function Business() {
     <StackSection
       id="business"
       theme="accent"
-      label={ru.sections[10]?.title ?? ""}
-      overlap
+      label={ru.sections[12]?.title ?? ""}
       sectionRef={sectionRef}
       className={styles.root}
     >
-      <div data-anchor="business-seam" className={styles.seam} aria-hidden="true" />
       <div className={styles.inner} style={{ minHeight: `${sectionHeights.business}vh` }}>
         <SplitLines as="h2" className={styles.title}>
           {business.title}

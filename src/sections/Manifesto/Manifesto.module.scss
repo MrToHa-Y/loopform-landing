@@ -20,9 +20,12 @@
 
 .photo {
   --photo: linear-gradient(115deg, var(--color-graphite) 30%, var(--color-cap-red) 68%, var(--color-sand));
-  --photo-height: 70vh;
-  --photo-size: max(100vw, var(--photo-height));
-  --photo-focus: 0.62;
+  --photo-height: 64vh;
+  --photo-ratio: 2.79;
+  --photo-width: max(100vw, calc(var(--photo-height) * var(--photo-ratio)));
+  --photo-size: calc(var(--photo-width) / var(--photo-ratio));
+  --photo-focus: 0.7;
+  --photo-focus-x: 50%;
 
   position: absolute;
   right: 0;
@@ -39,24 +42,8 @@
   margin-block: -0.5px;
   background-image: var(--photo);
   background-repeat: no-repeat;
-  background-position: 50% calc((var(--photo-height) - var(--photo-size)) * var(--photo-focus) - var(--band-index) * var(--photo-height) / 10);
-  background-size: var(--photo-size) var(--photo-size);
-}
-
-.withPhoto .band {
-  background-size: var(--photo-size) auto;
-}
-
-.caption {
-  @include mixins.eyebrow;
-
-  position: absolute;
-  top: var(--space-md);
-  right: var(--page-gutter);
-  padding: var(--space-2xs) var(--space-xs);
-  color: var(--color-bone);
-  background-color: var(--color-graphite);
-  border-radius: var(--radius-sm);
+  background-position: var(--photo-focus-x) calc((var(--photo-height) - var(--photo-size)) * var(--photo-focus) - var(--band-index) * var(--photo-height) / 10);
+  background-size: var(--photo-width) var(--photo-size);
 }
 
 .pilot {
@@ -74,12 +61,7 @@
 @include mixins.below("mobile") {
   .photo {
     --photo-height: 58vh;
-  }
-
-  .caption {
-    top: calc(var(--space-md) + var(--space-xl) + var(--space-2xs));
-    right: auto;
-    left: var(--page-gutter);
+    --photo-focus-x: 36%;
   }
 }
 

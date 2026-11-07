@@ -190,7 +190,6 @@ export function Catalog() {
                     {thumbnail ? (
                       <img src={thumbnail} alt={`${item.model}, ${item.type}`} loading="lazy" draggable={false} />
                     ) : null}
-                    {photo ? <span className={styles.aiNote}>{ru.brand.aiImageNote}</span> : null}
                   </div>
                   <div className={styles.caption}>
                     <h3 className={styles.cardName}>{item.model}</h3>

@@ -91,7 +91,7 @@ export function Process() {
     >
       <h2 className={styles.title}>{process.title}</h2>
       <ol ref={trackRef} className={styles.track}>
-        {process.steps.map((step, index) => (
+        {process.steps.map((step) => (
           <li key={step.number} className={styles.panel}>
             <div className={styles.copy}>
               <p className={styles.number} aria-hidden="true">
@@ -99,21 +99,14 @@ export function Process() {
               </p>
               <h3 className={styles.stepTitle}>{step.title}</h3>
               <p className={styles.text}>{step.text}</p>
-              {step.inset ? (
-                <figure className={styles.inset}>
-                  <img src={step.inset.src} alt={step.inset.alt} loading="lazy" />
-                  <figcaption className={styles.aiNote}>{ru.brand.aiImageNote}</figcaption>
-                </figure>
-              ) : null}
             </div>
-            {step.photo ? (
-              <figure className={styles.frame}>
+            <figure className={styles.frame}>
+              {step.photo ? (
                 <img src={step.photo.src} alt={step.photo.alt} loading="lazy" />
-                <figcaption className={styles.aiNote}>{ru.brand.aiImageNote}</figcaption>
-              </figure>
-            ) : (
-              <div data-anchor={`process-${index + 1}`} className={styles.anchor} aria-hidden="true" />
-            )}
+              ) : (
+                <div data-anchor="process-caps" className={styles.anchor} aria-hidden="true" />
+              )}
+            </figure>
           </li>
         ))}
       </ol>

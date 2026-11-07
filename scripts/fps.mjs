@@ -33,14 +33,18 @@ for (const [name, from, to] of [
   ["process", 1380, 1580],
   ["passport", 1680, 1810],
   ["configurator", 1880, 1960],
-  ["footer", 2500, 2567],
+  ["text", 2300, 2800],
+  ["footer", -170, -100],
 ]) {
   const fps = await page.evaluate(
     async ([startVh, endVh]) => {
       const height = window.innerHeight
       const lenis = window.__lenis
+      const total = (document.documentElement.scrollHeight / height) * 100
+      const fromVh = startVh < 0 ? total + startVh : startVh
+      const toVh = endVh < 0 ? total + endVh : endVh
 
-      lenis.scrollTo((startVh / 100) * height, { immediate: true, force: true })
+      lenis.scrollTo((fromVh / 100) * height, { immediate: true, force: true })
       await new Promise((resolve) => setTimeout(resolve, 500))
 
       const durationMs = 3500
@@ -48,7 +52,7 @@ for (const [name, from, to] of [
       const start = performance.now()
       let last = start
 
-      lenis.scrollTo((endVh / 100) * height, { duration: durationMs / 1000, force: true, easing: (value) => value })
+      lenis.scrollTo((toVh / 100) * height, { duration: durationMs / 1000, force: true, easing: (value) => value })
 
       await new Promise((resolve) => {
         const tick = (now) => {

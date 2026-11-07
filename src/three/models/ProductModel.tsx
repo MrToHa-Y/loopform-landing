@@ -4,6 +4,7 @@ import { Box3, Vector3 } from "three"
 import type { Material, Mesh, Object3D } from "three"
 import type { CatalogModelId } from "@/content/types"
 import { getModelParts } from "@/three/models/modelLibrary"
+import { withHeightLayers } from "@/three/models/geometryUtils"
 import { availableModels } from "@/three/models/modelAvailability"
 
 interface ProductModelProps {
@@ -12,6 +13,7 @@ interface ProductModelProps {
   depthMaterial: Material
   cushionMaterial: Material | null
   cushionVisible: boolean
+  topMaterial: Material | null
   castShadow: boolean
 }
 
@@ -40,6 +42,7 @@ function GltfModel({ path, height, material, depthMaterial }: GltfModelProps) {
     clone.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale)
     clone.traverse((object) => {
       if (isMesh(object)) {
+        withHeightLayers(object.geometry)
         object.material = material
         object.customDepthMaterial = depthMaterial
         object.castShadow = true
@@ -52,7 +55,7 @@ function GltfModel({ path, height, material, depthMaterial }: GltfModelProps) {
   return <primitive object={prepared} />
 }
 
-export function ProductModel({ model, material, depthMaterial, cushionMaterial, cushionVisible, castShadow }: ProductModelProps) {
+export function ProductModel({ model, material, depthMaterial, cushionMaterial, cushionVisible, topMaterial, castShadow }: ProductModelProps) {
   const parts = getModelParts(model)
   const path = availableModels.get(model)
 
@@ -66,6 +69,7 @@ export function ProductModel({ model, material, depthMaterial, cushionMaterial, 
       {parts.cushion && cushionMaterial ? (
         <mesh geometry={parts.cushion} material={cushionMaterial} visible={cushionVisible} castShadow={castShadow} />
       ) : null}
+      {parts.top && topMaterial ? <mesh geometry={parts.top} material={topMaterial} castShadow={castShadow} /> : null}
     </>
   )
 }

@@ -7,8 +7,6 @@ export type ActorId =
   | "qum"
   | "saule"
   | "stool"
-  | "processPrint"
-  | "processFinal"
   | "configChair"
 
 export interface ActorTarget {
@@ -25,6 +23,7 @@ export interface ActorTarget {
   stiffness: number
   printStiffness: number
   rotationStiffness: number
+  clipBottom: number
 }
 
 function createTarget(): ActorTarget {
@@ -42,6 +41,7 @@ function createTarget(): ActorTarget {
     stiffness: motion.anchorDamping,
     printStiffness: motion.printDamping,
     rotationStiffness: motion.anchorDamping,
+    clipBottom: -1,
   }
 }
 
@@ -51,8 +51,6 @@ export const actorModels: Record<ActorId, CatalogModelId> = {
   qum: "qum",
   saule: "saule",
   stool: "tas",
-  processPrint: "tolqyn",
-  processFinal: "tolqyn",
   configChair: "tolqyn",
 }
 

@@ -51,6 +51,7 @@ function resetActors() {
     target.printStiffness = motion.printDamping
     target.rotationStiffness = motion.anchorDamping
     target.direction = 1
+    target.clipBottom = -1
   })
   nozzleDirective.active = false
   shadowDirective.visible = false
@@ -134,7 +135,7 @@ function updateHeroAndCollection(size: StageSize) {
   chair.visible = entrance > 0.001 && (rig[0]?.print ?? 0) > 0.001
   chair.scale *= shrink
   chair.y += lift + (1 - entrance) * worldHeight * 0.9
-  chair.rotationY = mix(-25, 15, seam) * degrees + heroSpin
+  chair.rotationY = mix(-32, getModelParts("tolqyn").look.displayYaw, seam) * degrees + heroSpin
   chair.rotationZ = mix(6, 0, seam) * degrees
   chair.print = Math.min(printed, rig[0]?.print ?? 0)
   chair.direction = rig[0]?.direction ?? 1
@@ -151,7 +152,8 @@ function updateHeroAndCollection(size: StageSize) {
     target.visible = state.print > 0.001
     target.scale *= shrink
     target.y += lift
-    target.rotationY = (15 + Math.sin(time * 0.3) * 4) * degrees
+    target.rotationX = getModelParts(actorModels[id]).look.displayPitch * degrees
+    target.rotationY = (getModelParts(actorModels[id]).look.displayYaw + Math.sin(time * 0.3) * 4) * degrees
     target.rotationZ = 0
     target.print = state.print
     target.direction = state.direction
@@ -221,7 +223,7 @@ function updateProblem(size: StageSize) {
   return true
 }
 
-function updateProcess(size: StageSize) {
+function updateProcess() {
   const enter = readProgress("processEnter")
   const leave = readProgress("processLeave")
 
@@ -230,32 +232,6 @@ function updateProcess(size: StageSize) {
   }
 
   processDirective.visible = leave < 0.55
-
-  const track = readProgress("processTrack")
-  const fade = 1 - smooth(range(leave, 0, 0.6))
-  const printAnchor = readAnchor("process-4", size.width, size.height)
-  const finalAnchor = readAnchor("process-5", size.width, size.height)
-
-  if (printAnchor && printAnchor.x < 7 && printAnchor.x > -7) {
-    const target = place("processPrint", printAnchor, 0.92)
-
-    target.rotationY = -28 * degrees
-    target.rotationZ = 0
-    target.print = Math.min(range(track, 0.6, 0.9), fade)
-    target.stiffness = 40
-    target.visible = target.print > 0.002
-    setNozzle("processPrint")
-  }
-
-  if (finalAnchor && finalAnchor.x < 7) {
-    const target = place("processFinal", finalAnchor, 0.92)
-
-    target.rotationY = -28 * degrees
-    target.rotationZ = 0
-    target.print = fade
-    target.stiffness = 40
-    target.visible = fade > 0.002
-  }
 }
 
 function composeMorph(target: Matrix4, actor: ActorTarget, height: number) {
@@ -295,14 +271,9 @@ function updatePassport(size: StageSize) {
     return
   }
 
-  const stoolRect = { ...stoolAnchor }
+  const stool = place("stool", stoolAnchor)
 
-  if (seam.y > stoolRect.y) {
-    stoolRect.y = seam.y
-  }
-
-  const stool = place("stool", stoolRect)
-
+  stool.clipBottom = Math.max(seam.top, 0)
   stool.rotationY = 10 * degrees
   stool.rotationZ = 0
   stool.print = range(morph, morphTiming.coverStart, morphTiming.coverStart + morphTiming.coverSpan)
@@ -335,8 +306,8 @@ function updateConfigurator(size: StageSize) {
   chair.x += view.x
   chair.y += view.y
   chair.scale *= view.zoom
-  chair.rotationX = view.pitch * degrees
-  chair.rotationY = (-25 + view.yaw) * degrees
+  chair.rotationX = (view.pitch + getModelParts(actorModels.configChair).look.displayPitch) * degrees
+  chair.rotationY = (getModelParts(actorModels.configChair).look.displayYaw + view.yaw) * degrees
   chair.rotationZ = 0
   chair.rotationStiffness = 9
   chair.print = smooth(range(enter, 0.2, 1)) * configuratorRig.print
@@ -375,32 +346,6 @@ function updateMelt(size: StageSize) {
   melt.amplitude = 0.03 + swell * 0.05 + flood * 0.17
   melt.clipTop = Math.max(top.top, 0)
   melt.clipBottom = Math.min(seam.top, height)
-}
-
-function updateBusiness(size: StageSize) {
-  const seam = readAnchor("business-seam", size.width, size.height)
-  const reveal = readProgress("businessSeam")
-
-  if (!seam || reveal <= 0 || seam.bottom < -size.height * 0.25) {
-    return
-  }
-
-  const worldWidth = worldHeight * (size.width / size.height)
-  const stoolHeight = Math.min(worldHeight * 0.32, worldWidth * 0.5)
-  const rect: WorldRect = {
-    ...seam,
-    x: worldWidth * 0.2,
-    y: seam.y + stoolHeight * 0.32,
-    width: stoolHeight * 1.4,
-    height: stoolHeight,
-  }
-  const stool = place("stool", rect)
-
-  stool.rotationY = -18 * degrees
-  stool.rotationZ = 0
-  stool.print = smooth(range(reveal, 0, 0.45))
-  stool.stiffness = 40
-  setNozzle("stool")
 }
 
 function inView(rect: WorldRect | null, height: number) {
@@ -450,23 +395,21 @@ function updateStatic(size: StageSize) {
     setParticles("cloud", "cloud", 1)
   } else {
     setParticles("hidden", "hidden", 0)
-    placeStatic("tolqyn", "collection-product-0", size, -25, 0, 0.8)
+    placeStatic("tolqyn", "collection-product-0", size, -45, 0, 0.8)
     placeStatic("tolqyn", "passport-chair", size, -20, 120)
   }
 
   collectionActors.forEach((id, index) => {
     if (index > 0) {
-      placeStatic(id, `collection-product-${index}`, size, 15, 0, (collectionFill[index] ?? 1) * 0.86)
+      placeStatic(id, `collection-product-${index}`, size, getModelParts(actorModels[id]).look.displayYaw, 0, (collectionFill[index] ?? 1) * 0.86)
     }
   })
 
   placeStatic("stool", "passport-stool", size, 10)
   placeStatic("configChair", "configurator-product", size, -25, 0, 0.88)
-  placeStatic("processPrint", "process-4", size, -28, 0, 0.9)
-  placeStatic("processFinal", "process-5", size, -28, 0, 0.9)
 
-  actorTargets.configChair.rotationY = (-25 + configuratorView.yaw) * degrees
-  processDirective.visible = inView(readAnchor("process-1", size.width, size.height), size.height)
+  actorTargets.configChair.rotationY = (getModelParts(actorModels.configChair).look.displayYaw + configuratorView.yaw) * degrees
+  processDirective.visible = inView(readAnchor("process-caps", size.width, size.height), size.height)
 }
 
 export function runChoreography(size: StageSize) {
@@ -488,8 +431,7 @@ export function runChoreography(size: StageSize) {
   updateHeroAndCollection(size)
   updateMelt(size)
   updateProblem(size)
-  updateProcess(size)
+  updateProcess()
   updatePassport(size)
   updateConfigurator(size)
-  updateBusiness(size)
 }

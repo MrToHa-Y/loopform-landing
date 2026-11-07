@@ -1,129 +1,314 @@
-import { CylinderGeometry, ExtrudeGeometry, Path, Shape } from "three"
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js"
-import { finishGeometry, lathe, profileCurve, strokeToShape } from "./geometryUtils"
+import { BufferGeometry, ExtrudeGeometry, Float32BufferAttribute, Path, Shape, ShapeUtils, Vector2 } from "three"
+import { finishGeometry, gridSurface, latheSurface, mergeParts, withHeightLayers } from "./geometryUtils"
 
-function merge(parts: Parameters<typeof mergeGeometries>[0]) {
-  const prepared = parts.map((part) => {
-    const flat = part.index ? part.toNonIndexed() : part
-    flat.deleteAttribute("uv")
-    return flat
-  })
-  const merged = mergeGeometries(prepared)
+export function createTableParts() {
+  const base = latheSurface(
+    [
+      [0, 0],
+      [0.235, 0],
+      [0.25, 0.006],
+      [0.258, 0.03],
+      [0.256, 0.1],
+      [0.252, 0.2],
+      [0.256, 0.262],
+      [0.272, 0.298],
+      [0.298, 0.322],
+      [0.316, 0.34],
+      [0.344, 0.358],
+      [0.364, 0.376],
+      [0.386, 0.392],
+      [0.402, 0.41],
+      [0.408, 0.426],
+      [0.39, 0.43],
+      [0, 0.43],
+    ],
+    112,
+    150,
+  )
+  const top = latheSurface(
+    [
+      [0, 0.43],
+      [0.2, 0.43],
+      [0.39, 0.43],
+      [0.414, 0.431],
+      [0.424, 0.438],
+      [0.426, 0.451],
+      [0.424, 0.463],
+      [0.414, 0.471],
+      [0.39, 0.472],
+      [0.2, 0.472],
+      [0, 0.472],
+    ],
+    128,
+    60,
+    0,
+  )
+  const main = finishGeometry(base, null, [top])
 
-  if (!merged) {
-    throw new Error("Catalog geometry merge failed")
+  top.computeBoundingBox()
+
+  if (main.boundingBox && top.boundingBox) {
+    main.boundingBox.union(top.boundingBox)
   }
 
-  return merged
-}
-
-export function createTableGeometry() {
-  const base = lathe([
-    [0, 0],
-    [0.28, 0],
-    [0.3, 0.03],
-    [0.12, 0.2],
-    [0.14, 0.36],
-    [0, 0.36],
-  ])
-  const top = new CylinderGeometry(0.4, 0.4, 0.04, 96)
-
-  top.translate(0, 0.38, 0)
-
-  return finishGeometry(merge([base, top]), 1)
+  return { main, top }
 }
 
 export function createPlanterGeometry() {
   return finishGeometry(
-    lathe([
-      [0, 0],
-      [0.11, 0],
-      [0.13, 0.02],
-      [0.18, 0.22],
-      [0.2, 0.3],
-      [0.19, 0.3],
-      [0.165, 0.23],
-      [0, 0.22],
-    ]),
-    null,
+    latheSurface(
+      [
+        [0, 0],
+        [0.07, 0],
+        [0.08, 0.002],
+        [0.085, 0.01],
+        [0.1, 0.08],
+        [0.118, 0.16],
+        [0.134, 0.226],
+        [0.137, 0.234],
+        [0.134, 0.24],
+        [0.122, 0.243],
+        [0.06, 0.244],
+        [0.015, 0.241],
+        [0, 0.24],
+      ],
+      96,
+      140,
+    ),
   )
 }
 
-export function createBenchGeometry() {
-  const curve = profileCurve([
-    [-0.22, 0.02],
-    [-0.2, 0.43],
-    [0.2, 0.43],
-    [0.22, 0.02],
-  ])
-  const geometry = new ExtrudeGeometry(strokeToShape(curve, 0.05), {
-    depth: 1.8,
-    bevelEnabled: true,
-    bevelSize: 0.012,
-    bevelThickness: 0.012,
-    bevelSegments: 3,
-    steps: 1,
+const benchLength = 1.45
+const benchWidth = 0.5
+const benchHeight = 0.45
+const benchShoulder = 0.175
+const benchWall = 0.098
+const benchArchTop = 0.335
+const benchEdge = 0.022
+const benchLayer = 0.0105
+
+interface ContourPoint {
+  x: number
+  y: number
+  normalX: number
+  normalY: number
+}
+
+function arc(centerX: number, centerY: number, radius: number, from: number, to: number, steps: number, inward: boolean) {
+  const points: ContourPoint[] = []
+
+  for (let index = 0; index <= steps; index += 1) {
+    const angle = from + ((to - from) * index) / steps
+    const cos = Math.cos(angle)
+    const sin = Math.sin(angle)
+
+    points.push({
+      x: centerX + cos * radius,
+      y: centerY + sin * radius,
+      normalX: inward ? -cos : cos,
+      normalY: inward ? -sin : sin,
+    })
+  }
+
+  return points
+}
+
+function line(fromX: number, fromY: number, toX: number, toY: number, steps: number, normalX: number, normalY: number) {
+  const points: ContourPoint[] = []
+
+  for (let index = 0; index < steps; index += 1) {
+    const amount = index / steps
+
+    points.push({ x: fromX + (toX - fromX) * amount, y: fromY + (toY - fromY) * amount, normalX, normalY })
+  }
+
+  return points
+}
+
+function benchContour() {
+  const half = benchWidth / 2
+  const inner = half - benchWall
+  const shoulderY = benchHeight - benchShoulder
+  const archY = benchArchTop - inner
+
+  return [
+    ...line(half, 0, half, shoulderY, 14, 1, 0),
+    ...arc(half - benchShoulder, shoulderY, benchShoulder, 0, Math.PI / 2, 36, false),
+    ...line(half - benchShoulder, benchHeight, -half + benchShoulder, benchHeight, 6, 0, 1),
+    ...arc(-half + benchShoulder, shoulderY, benchShoulder, Math.PI / 2, Math.PI, 36, false),
+    ...line(-half, shoulderY, -half, 0, 14, -1, 0),
+    ...line(-half, 0, -inner, 0, 3, 0, -1),
+    ...line(-inner, 0, -inner, archY, 12, 1, 0),
+    ...arc(0, archY, inner, Math.PI, 0, 48, true),
+    ...line(inner, archY, inner, 0, 12, -1, 0),
+    ...line(inner, 0, half, 0, 3, 0, -1),
+  ]
+}
+
+function benchLayerAt(y: number) {
+  const shoulderY = benchHeight - benchShoulder
+
+  if (y <= shoulderY) {
+    return y
+  }
+
+  const rise = Math.min((y - shoulderY) / benchShoulder, 1)
+  const total = shoulderY + Math.asin(rise) * benchShoulder
+  const top = shoulderY + (Math.PI / 2) * benchShoulder
+  const aligned = (Math.floor(top / benchLayer) + 0.5) * benchLayer
+
+  return total + (aligned - top) * rise
+}
+
+function benchSection(contour: ContourPoint[], inset: number) {
+  return contour.map((point) => new Vector2(point.x - point.normalX * inset, Math.max(point.y - point.normalY * inset, 0)))
+}
+
+function createBenchCap(contour: ContourPoint[], inset: number, z: number, facing: number) {
+  const section = benchSection(contour, inset)
+  const triangles = ShapeUtils.triangulateShape(section, [])
+  const positions: number[] = []
+  const normals: number[] = []
+  const layers: number[] = []
+
+  triangles.forEach(([a, b, c]) => {
+    const order = facing > 0 ? [a, b, c] : [a, c, b]
+
+    order.forEach((index) => {
+      const point = section[index ?? 0]
+
+      if (point) {
+        positions.push(point.x, point.y, z)
+        normals.push(0, 0, facing)
+        layers.push(benchLayerAt(point.y))
+      }
+    })
   })
+
+  const cap = new BufferGeometry()
+
+  cap.setAttribute("position", new Float32BufferAttribute(positions, 3))
+  cap.setAttribute("normal", new Float32BufferAttribute(normals, 3))
+  cap.setAttribute("aLayer", new Float32BufferAttribute(layers, 1))
+
+  return cap
+}
+
+export function createBenchGeometry() {
+  const contour = benchContour()
+  const edgeRows = 6
+  const stations: { z: number; inset: number }[] = []
+
+  for (let index = 0; index <= edgeRows; index += 1) {
+    const sweep = (index / edgeRows) * (Math.PI / 2)
+
+    stations.push({ z: -benchLength / 2 + benchEdge * (1 - Math.cos(sweep)), inset: benchEdge * (1 - Math.sin(sweep)) })
+  }
+
+  for (let index = edgeRows; index >= 0; index -= 1) {
+    const sweep = (index / edgeRows) * (Math.PI / 2)
+
+    stations.push({ z: benchLength / 2 - benchEdge * (1 - Math.cos(sweep)), inset: benchEdge * (1 - Math.sin(sweep)) })
+  }
+
+  const body = gridSurface(contour.length, stations.length - 1, true, (column, row) => {
+    const point = contour[column]
+    const station = stations[row]
+
+    if (!point || !station) {
+      return [0, 0, 0, 0]
+    }
+
+    const y = Math.max(point.y - point.normalY * station.inset, 0)
+
+    return [point.x - point.normalX * station.inset, y, station.z, benchLayerAt(y)]
+  })
+  const geometry = mergeParts([
+    body,
+    createBenchCap(contour, benchEdge, -benchLength / 2, -1),
+    createBenchCap(contour, benchEdge, benchLength / 2, 1),
+  ])
 
   geometry.rotateY(Math.PI / 2)
 
   return finishGeometry(geometry)
 }
 
-function diamondHole(x: number, y: number, size: number) {
+const panelWidth = 0.5
+const panelHeight = 1.6
+const panelDepth = 0.05
+const hingeGap = 0.012
+
+function diamondHole(x: number, y: number) {
+  const halfWidth = 0.0375
+  const halfHeight = 0.06
   const hole = new Path()
 
-  hole.moveTo(x, y - size)
-  hole.lineTo(x + size * 0.7, y)
-  hole.lineTo(x, y + size)
-  hole.lineTo(x - size * 0.7, y)
+  hole.moveTo(x, y - halfHeight)
+  hole.lineTo(x + halfWidth, y)
+  hole.lineTo(x, y + halfHeight)
+  hole.lineTo(x - halfWidth, y)
   hole.closePath()
 
   return hole
 }
 
-function createPanel(offset: number, angle: number) {
+function createPanel(startX: number, startZ: number, heading: number) {
   const shape = new Shape()
 
-  shape.moveTo(-0.25, 0)
-  shape.lineTo(0.25, 0)
-  shape.lineTo(0.25, 1.8)
-  shape.lineTo(-0.25, 1.8)
+  shape.moveTo(0, 0)
+  shape.lineTo(panelWidth, 0)
+  shape.lineTo(panelWidth, panelHeight)
+  shape.lineTo(0, panelHeight)
   shape.closePath()
 
   for (let row = 0; row < 9; row += 1) {
-    for (let column = 0; column < 3; column += 1) {
-      const shift = row % 2 === 0 ? 0 : 0.07
-      const x = -0.14 + column * 0.14 + shift
+    const y = panelHeight * (0.1 + row * 0.1)
+    const columns = row % 2 === 0 ? [0.2, 0.5, 0.8] : [0.35, 0.65]
 
-      if (x < 0.2) {
-        shape.holes.push(diamondHole(x, 0.18 + row * 0.18, 0.06))
-      }
-    }
+    columns.forEach((column) => {
+      shape.holes.push(diamondHole(panelWidth * column, y))
+    })
   }
 
-  const panel = new ExtrudeGeometry(shape, { depth: 0.03, bevelEnabled: false, curveSegments: 2 })
+  const panel = new ExtrudeGeometry(shape, { depth: panelDepth, bevelEnabled: false, curveSegments: 1 })
 
-  panel.rotateY(angle)
-  panel.translate(offset, 0, 0)
+  panel.translate(0, 0, -panelDepth / 2)
+  panel.rotateY(-heading)
+  panel.translate(startX, 0, startZ)
 
-  return panel
+  return withHeightLayers(panel)
 }
 
 export function createScreenGeometry() {
-  return finishGeometry(merge([createPanel(-0.5, 0.35), createPanel(0, -0.35), createPanel(0.5, 0.35)]), 0.5)
+  const headings = [-0.22, 0.64, -0.2]
+  const panels: BufferGeometry[] = []
+  let x = 0
+  let z = 0
+
+  headings.forEach((heading) => {
+    panels.push(createPanel(x, z, heading))
+    x += Math.cos(heading) * (panelWidth + hingeGap)
+    z += Math.sin(heading) * (panelWidth + hingeGap)
+  })
+
+  return finishGeometry(mergeParts(panels), 0.5)
 }
 
+const cellRadius = 0.15
+const cellWall = 0.036
+const cellDepth = 0.2
+const cellGap = 0.003
+
 function createHexCell(x: number, y: number) {
-  const radius = 0.17
-  const inner = 0.145
+  const inner = cellRadius - cellWall / Math.cos(Math.PI / 6)
   const outline = new Shape()
   const hole = new Path()
 
   for (let index = 0; index < 6; index += 1) {
     const angle = (index / 6) * Math.PI * 2 + Math.PI / 6
-    const px = x + Math.cos(angle) * radius
-    const py = y + Math.sin(angle) * radius
+    const px = x + Math.cos(angle) * cellRadius
+    const py = y + Math.sin(angle) * cellRadius
     const hx = x + Math.cos(angle) * inner
     const hy = y + Math.sin(angle) * inner
 
@@ -140,12 +325,18 @@ function createHexCell(x: number, y: number) {
   hole.closePath()
   outline.holes.push(hole)
 
-  return new ExtrudeGeometry(outline, { depth: 0.2, bevelEnabled: false })
+  return withHeightLayers(new ExtrudeGeometry(outline, { depth: cellDepth, bevelEnabled: false }))
 }
 
 export function createShelfGeometry() {
+  const half = (cellRadius * Math.sqrt(3)) / 2 + cellGap
+
   return finishGeometry(
-    merge([createHexCell(0, 0.17), createHexCell(0.3, 0.17), createHexCell(0.15, 0.43)]),
+    mergeParts([
+      createHexCell(-half, cellRadius),
+      createHexCell(half, cellRadius),
+      createHexCell(0, cellRadius * 2.5 + cellGap * 2),
+    ]),
     0.5,
   )
 }

@@ -112,9 +112,6 @@ export function Manifesto() {
             style={{ "--band-index": index } as CSSProperties}
           />
         ))}
-        <figcaption data-photo-label className={styles.caption}>
-          {manifesto.imageCaption}
-        </figcaption>
         <p data-photo-label className={styles.pilot}>
           {manifesto.pilotCall}
         </p>

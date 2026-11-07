@@ -6,9 +6,11 @@ import { MiniProductCard } from "@/components/MiniProductCard/MiniProductCard"
 import { Preloader } from "@/components/Preloader/Preloader"
 import { ProgressRail } from "@/components/ProgressRail/ProgressRail"
 import { RotatingBadge } from "@/components/RotatingBadge/RotatingBadge"
+import { Advantages } from "@/sections/Advantages/Advantages"
 import { Business } from "@/sections/Business/Business"
 import { Catalog } from "@/sections/Catalog/Catalog"
 import { Collection } from "@/sections/Collection/Collection"
+import { Competition } from "@/sections/Competition/Competition"
 import { Configurator } from "@/sections/Configurator/Configurator"
 import { Cta } from "@/sections/Cta/Cta"
 import { Faq } from "@/sections/Faq/Faq"
@@ -19,6 +21,7 @@ import { Manifesto } from "@/sections/Manifesto/Manifesto"
 import { Market } from "@/sections/Market/Market"
 import { Melt } from "@/sections/Melt/Melt"
 import { Passport } from "@/sections/Passport/Passport"
+import { Philosophy } from "@/sections/Philosophy/Philosophy"
 import { Problem } from "@/sections/Problem/Problem"
 import { Process } from "@/sections/Process/Process"
 
@@ -51,8 +54,11 @@ function App() {
         <Passport />
         <Configurator />
         <Manifesto />
+        <Philosophy />
+        <Advantages />
         <Business />
         <Market />
+        <Competition />
         <Faq />
         <Cta />
       </main>

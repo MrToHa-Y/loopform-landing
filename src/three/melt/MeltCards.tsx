@@ -30,6 +30,7 @@ interface Card {
 const startDepth = -1.4
 const travelDepth = 13.2
 const fadeStart = 8.6
+const goldenAngle = 2.39996
 
 function createMaterial(width: number, height: number, radius: number, map: Texture | null, cover: boolean) {
   const aspect = width / height
@@ -89,11 +90,10 @@ export function MeltCards() {
     const random = createRandom(83)
     const loader = new TextureLoader()
     const list: Card[] = []
-    const photos = meltPhotos.flatMap((path, index) => (index < 6 ? [path, path] : [path]))
-    const total = photos.length + ru.melt.labels.length
+    const total = meltPhotos.length + ru.melt.labels.length
 
-    photos.forEach((path, index) => {
-      const angle = (index / photos.length) * Math.PI * 2 + random() * 0.5
+    meltPhotos.forEach((path, index) => {
+      const angle = index * goldenAngle + random() * 0.5
       const distance = 1.1 + random() * 1.9
       const width = 0.75 + random() * 0.85
       const height = width * (0.68 + random() * 0.3)

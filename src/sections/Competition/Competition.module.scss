@@ -1,0 +1,131 @@
+@use "@/styles/mixins";
+
+.root {
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+}
+
+.inner {
+  @include mixins.page-gutter;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-block: var(--section-padding);
+}
+
+.eyebrow {
+  @include mixins.eyebrow;
+}
+
+.title {
+  @include mixins.serif("lg");
+
+  max-width: 70vw;
+}
+
+.lead {
+  max-width: 52vw;
+  font-size: var(--text-lead);
+  line-height: var(--leading-snug);
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1.1fr 1.6fr 1.6fr;
+  gap: var(--space-md);
+  padding-block: var(--space-sm);
+  border-top: var(--hairline) solid rgb(from var(--color-bone) r g b / 25%);
+}
+
+.head {
+  @include mixins.eyebrow;
+
+  padding-block: var(--space-xs);
+  border-top: 0;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.name {
+  @include mixins.serif("sm");
+}
+
+.place {
+  font-family: var(--font-mono);
+  font-size: var(--text-source);
+}
+
+.cell {
+  font-size: var(--text-body);
+  line-height: var(--leading-snug);
+}
+
+.answer {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  color: var(--color-sun);
+}
+
+.source {
+  font-family: var(--font-mono);
+  font-size: var(--text-source);
+  white-space: nowrap;
+  text-decoration: underline;
+}
+
+.note {
+  @include mixins.serif("md");
+
+  max-width: 70vw;
+}
+
+.demand {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.value {
+  @include mixins.number;
+
+  font-size: var(--text-figure);
+}
+
+@include mixins.below("mobile") {
+  .title,
+  .lead,
+  .note {
+    max-width: none;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2xs);
+  }
+
+  .head {
+    display: none;
+  }
+
+  .demand {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-sm);
+  }
+}

@@ -2,9 +2,28 @@ import { Color } from "three"
 import type { ColorToken } from "@/content/types"
 import { readColor } from "@/styles/readToken"
 
+export type PaletteToken =
+  | ColorToken
+  | "nozzle"
+  | "paper"
+  | "ink"
+  | "lamp"
+  | "studio"
+  | "pine"
+  | "moss"
+  | "dune"
+  | "linen"
+  | "clay"
+  | "oak"
+  | "felt"
+  | "teal"
+  | "brick"
+  | "mustard"
+  | "cobalt"
+
 const cache = new Map<string, Color>()
 
-export function paletteColor(token: ColorToken | "nozzle" | "paper" | "ink" | "lamp") {
+export function paletteColor(token: PaletteToken) {
   const cached = cache.get(token)
 
   if (cached) {
@@ -15,15 +34,4 @@ export function paletteColor(token: ColorToken | "nozzle" | "paper" | "ink" | "l
   cache.set(token, color)
 
   return color
-}
-
-export function speckleColors(base: ColorToken): [Color, Color, Color] {
-  const options: ColorToken[] = ["cap-red", "cap-blue", "bottle-green", "sun", "bone"]
-  const picks = options.filter((token) => token !== base).slice(0, 3)
-
-  return [
-    paletteColor(picks[0] ?? "bone"),
-    paletteColor(picks[1] ?? "sun"),
-    paletteColor(picks[2] ?? "graphite"),
-  ]
 }

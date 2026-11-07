@@ -10,14 +10,15 @@ import {
   Vector3,
   WebGLRenderer,
 } from "three"
+import { productPhotos } from "@/content/images"
 import { ru } from "@/content/ru"
 import type { CatalogModelId } from "@/content/types"
 import { thumbnails, useScrollStore } from "@/state/scrollStore"
-import { createPrintMaterial } from "@/three/materials/printMaterial"
 import { getModelParts } from "@/three/models/modelLibrary"
-import { paletteColor, speckleColors } from "@/three/palette"
+import { createBodyBundle, createFeltBundle, createOakBundle } from "@/three/models/modelMaterials"
+import { paletteColor } from "@/three/palette"
 
-const width = 620
+const width = 720
 const height = 720
 
 function nextIdle() {
@@ -40,7 +41,14 @@ function toObjectUrl(canvas: HTMLCanvasElement) {
 }
 
 export async function renderThumbnails() {
-  const slugs = ru.catalog.items.map((item) => item.slug).filter((slug): slug is CatalogModelId => slug !== null)
+  const slugs = ru.catalog.items
+    .map((item) => item.slug)
+    .filter((slug): slug is CatalogModelId => slug !== null && !productPhotos[slug])
+
+  if (slugs.length === 0) {
+    return
+  }
+
   const renderer = new WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
 
   renderer.setSize(width, height, false)
@@ -51,7 +59,7 @@ export async function renderThumbnails() {
   const camera = new PerspectiveCamera(22, width / height, 0.1, 40)
   const key = new DirectionalLight(paletteColor("bone"), 2.6)
 
-  scene.background = paletteColor("paper")
+  scene.background = paletteColor("studio")
   key.position.set(-3, 5, 5)
   scene.add(key, new AmbientLight(paletteColor("bone"), 1.3))
 
@@ -59,21 +67,20 @@ export async function renderThumbnails() {
     await nextIdle()
 
     const parts = getModelParts(slug)
-    const bundle = createPrintMaterial({
-      color: paletteColor(parts.color),
-      speckle: speckleColors(parts.color),
-      edgeColor: paletteColor("nozzle"),
-    })
+    const bundle = createBodyBundle(parts)
 
     bundle.uniforms.uMaxY.value = parts.size.y
-    bundle.uniforms.uLayerHeight.value = 0.008
 
     const group = new Group()
 
     group.add(new Mesh(parts.main, bundle.material))
 
     if (parts.cushion && slug === "qum") {
-      group.add(new Mesh(parts.cushion, bundle.material))
+      group.add(new Mesh(parts.cushion, createFeltBundle().material))
+    }
+
+    if (parts.top) {
+      group.add(new Mesh(parts.top, createOakBundle().material))
     }
 
     group.rotation.y = -0.5

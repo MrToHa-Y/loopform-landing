@@ -183,6 +183,7 @@
 }
 
 .modelThumb {
+  position: relative;
   display: block;
   width: 100%;
   aspect-ratio: 1;
@@ -193,6 +194,8 @@
   transition: border-color var(--duration-fast) var(--ease-out);
 
   img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;

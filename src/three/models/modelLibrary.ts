@@ -1,31 +1,167 @@
 import { Vector3 } from "three"
 import type { BufferGeometry } from "three"
-import type { CatalogModelId, ColorToken } from "@/content/types"
-import { createBenchGeometry, createPlanterGeometry, createScreenGeometry, createShelfGeometry, createTableGeometry } from "./proceduralCatalog"
-import { createChairCushion, createChairGeometry } from "./proceduralChair"
+import type { CatalogModelId } from "@/content/types"
+import type { PaletteToken } from "@/three/palette"
+import { createBenchGeometry, createPlanterGeometry, createScreenGeometry, createShelfGeometry, createTableParts } from "./proceduralCatalog"
+import { createChairParts } from "./proceduralChair"
 import { createLampGeometry } from "./proceduralLamp"
-import { createLoungeCushion, createLoungeGeometry } from "./proceduralLounge"
+import { createLoungeParts } from "./proceduralLounge"
 import { createBarStoolGeometry, createStoolGeometry } from "./proceduralStool"
+
+export interface ModelLook {
+  color: PaletteToken
+  speckle: readonly [PaletteToken, PaletteToken, PaletteToken]
+  speckleAmount: number
+  speckleScale: number
+  layerHeight: number
+  displayYaw: number
+  displayPitch: number
+  glow: boolean
+}
 
 export interface ModelParts {
   main: BufferGeometry
   cushion: BufferGeometry | null
+  top: BufferGeometry | null
   size: Vector3
-  color: ColorToken
-  translucent: boolean
+  look: ModelLook
 }
 
-const builders: Record<CatalogModelId, () => Pick<ModelParts, "main" | "cushion"> & Partial<ModelParts>> = {
-  tolqyn: () => ({ main: createChairGeometry(), cushion: createChairCushion(), color: "cap-red" }),
-  tas: () => ({ main: createStoolGeometry(), cushion: null, color: "bottle-green" }),
-  biik: () => ({ main: createBarStoolGeometry(), cushion: null, color: "cap-blue" }),
-  qum: () => ({ main: createLoungeGeometry(), cushion: createLoungeCushion(), color: "sand" }),
-  kol: () => ({ main: createTableGeometry(), cushion: null, color: "sand" }),
-  saule: () => ({ main: createLampGeometry(), cushion: null, color: "cap-blue", translucent: true }),
-  japyraq: () => ({ main: createPlanterGeometry(), cushion: null, color: "bottle-green" }),
-  saiabaq: () => ({ main: createBenchGeometry(), cushion: null, color: "cap-red" }),
-  ornek: () => ({ main: createScreenGeometry(), cushion: null, color: "sand" }),
-  uya: () => ({ main: createShelfGeometry(), cushion: null, color: "sun" }),
+type Built = { main: BufferGeometry; cushion?: BufferGeometry; top?: BufferGeometry }
+
+const speckleLook = { glow: false } as const
+
+const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = {
+  tolqyn: {
+    build: createChairParts,
+    look: {
+      ...speckleLook,
+      color: "brick",
+      speckle: ["bone", "sand", "sun"],
+      speckleAmount: 0.05,
+      speckleScale: 190,
+      layerHeight: 0.0132,
+      displayYaw: -45,
+      displayPitch: 6,
+    },
+  },
+  tas: {
+    build: () => ({ main: createStoolGeometry() }),
+    look: {
+      ...speckleLook,
+      color: "pine",
+      speckle: ["bone", "teal", "bone"],
+      speckleAmount: 0.05,
+      speckleScale: 210,
+      layerHeight: 0.0084,
+      displayYaw: 0,
+      displayPitch: 8,
+    },
+  },
+  biik: {
+    build: () => ({ main: createBarStoolGeometry() }),
+    look: {
+      ...speckleLook,
+      color: "cap-blue",
+      speckle: ["bone", "sun", "cap-red"],
+      speckleAmount: 0.05,
+      speckleScale: 190,
+      layerHeight: 0.0105,
+      displayYaw: 0,
+      displayPitch: 8,
+    },
+  },
+  qum: {
+    build: createLoungeParts,
+    look: {
+      ...speckleLook,
+      color: "dune",
+      speckle: ["nozzle", "clay", "oak"],
+      speckleAmount: 0.06,
+      speckleScale: 170,
+      layerHeight: 0.0136,
+      displayYaw: -62,
+      displayPitch: 16,
+    },
+  },
+  kol: {
+    build: createTableParts,
+    look: {
+      ...speckleLook,
+      color: "linen",
+      speckle: ["oak", "clay", "nozzle"],
+      speckleAmount: 0.09,
+      speckleScale: 230,
+      layerHeight: 0.0118,
+      displayYaw: 0,
+      displayPitch: 8,
+    },
+  },
+  saule: {
+    build: () => ({ main: createLampGeometry() }),
+    look: {
+      color: "cobalt",
+      speckle: ["bone", "bone", "sand"],
+      speckleAmount: 0.06,
+      speckleScale: 380,
+      layerHeight: 0.0058,
+      displayYaw: 0,
+      displayPitch: 8,
+      glow: true,
+    },
+  },
+  japyraq: {
+    build: () => ({ main: createPlanterGeometry() }),
+    look: {
+      ...speckleLook,
+      color: "moss",
+      speckle: ["cap-red", "sun", "cap-blue"],
+      speckleAmount: 0.16,
+      speckleScale: 130,
+      layerHeight: 0.0058,
+      displayYaw: 0,
+      displayPitch: 8,
+    },
+  },
+  saiabaq: {
+    build: () => ({ main: createBenchGeometry() }),
+    look: {
+      ...speckleLook,
+      color: "brick",
+      speckle: ["sun", "cap-blue", "bottle-green"],
+      speckleAmount: 0.1,
+      speckleScale: 120,
+      layerHeight: 0.0105,
+      displayYaw: -36,
+      displayPitch: 18,
+    },
+  },
+  ornek: {
+    build: () => ({ main: createScreenGeometry() }),
+    look: {
+      ...speckleLook,
+      color: "clay",
+      speckle: ["cap-red", "cap-blue", "bottle-green"],
+      speckleAmount: 0.14,
+      speckleScale: 62,
+      layerHeight: 0.0185,
+      displayYaw: 0,
+      displayPitch: 8,
+    },
+  },
+  uya: {
+    build: () => ({ main: createShelfGeometry() }),
+    look: {
+      ...speckleLook,
+      color: "mustard",
+      speckle: ["cap-red", "cap-blue", "bottle-green"],
+      speckleAmount: 0.16,
+      speckleScale: 62,
+      layerHeight: 0.0078,
+      displayYaw: -22,
+      displayPitch: 4,
+    },
+  },
 }
 
 const cache = new Map<CatalogModelId, ModelParts>()
@@ -37,7 +173,8 @@ export function getModelParts(id: CatalogModelId): ModelParts {
     return cached
   }
 
-  const built = builders[id]()
+  const { build, look } = models[id]
+  const built = build()
   const box = built.main.boundingBox
 
   if (!box) {
@@ -46,10 +183,10 @@ export function getModelParts(id: CatalogModelId): ModelParts {
 
   const parts: ModelParts = {
     main: built.main,
-    cushion: built.cushion,
+    cushion: built.cushion ?? null,
+    top: built.top ?? null,
     size: box.getSize(new Vector3()),
-    color: built.color ?? "cap-red",
-    translucent: built.translucent ?? false,
+    look,
   }
 
   cache.set(id, parts)

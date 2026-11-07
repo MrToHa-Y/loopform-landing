@@ -1,0 +1,88 @@
+@use "@/styles/mixins";
+
+.root {
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+}
+
+.inner {
+  @include mixins.page-gutter;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-block: var(--section-padding);
+}
+
+.eyebrow {
+  @include mixins.eyebrow;
+}
+
+.title {
+  @include mixins.caps-title;
+}
+
+.lead {
+  @include mixins.serif("lg");
+
+  max-width: 62vw;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  max-width: 62vw;
+}
+
+.paragraph {
+  font-size: var(--text-lead);
+  line-height: var(--leading-snug);
+}
+
+.principles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.principle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding-top: var(--space-sm);
+  border-top: var(--hairline) solid rgb(from var(--color-bone) r g b / 35%);
+}
+
+.number {
+  @include mixins.eyebrow;
+}
+
+.principleTitle {
+  @include mixins.serif("sm");
+}
+
+.principleText {
+  font-size: var(--text-body);
+  line-height: var(--leading-snug);
+}
+
+@include mixins.below("tablet") {
+  .principles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include mixins.below("mobile") {
+  .lead,
+  .columns {
+    max-width: none;
+  }
+
+  .columns,
+  .principles {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-sm);
+  }
+}

@@ -18,7 +18,6 @@ export const ru: Content = {
       { role: "SAULE", name: "Cap Blue", token: "cap-blue" },
       { role: "Инфографика и кнопки", name: "Sun", token: "sun" },
     ],
-    aiImageNote: "Изображение создано ИИ",
     badge: "100% ПЕРЕРАБОТАННЫЙ ПЛАСТИК • LOOPFORM • ",
     monogram: "OO",
   },
@@ -34,11 +33,14 @@ export const ru: Content = {
     { id: "passport", number: "08", title: "Паспорт" },
     { id: "configurator", number: "09", title: "Конфигуратор" },
     { id: "manifesto", number: "10", title: "Манифест" },
-    { id: "business", number: "11", title: "Для бизнеса" },
-    { id: "market", number: "12", title: "Рынок" },
-    { id: "faq", number: "13", title: "FAQ" },
-    { id: "cta", number: "14", title: "CTA" },
-    { id: "footer", number: "15", title: "Футер" },
+    { id: "philosophy", number: "11", title: "Философия" },
+    { id: "advantages", number: "12", title: "Преимущества" },
+    { id: "business", number: "13", title: "Для бизнеса" },
+    { id: "market", number: "14", title: "Рынок" },
+    { id: "competition", number: "15", title: "Конкуренция" },
+    { id: "faq", number: "16", title: "FAQ" },
+    { id: "cta", number: "17", title: "CTA" },
+    { id: "footer", number: "18", title: "Футер" },
   ],
 
   preloader: {
@@ -409,18 +411,18 @@ export const ru: Content = {
         number: "04",
         title: "Печатаем слой за слоем.",
         text: "Принтер плавит хлопья напрямую, стул готов за 3 часа.",
-        inset: {
+        photo: {
           src: "/images/process/printing.webp",
-          alt: "Сопло принтера укладывает раскалённый слой на спинку красного стула",
+          alt: "Сопло принтера укладывает раскалённый слой на панель с ромбовидными отверстиями",
         },
       },
       {
         number: "05",
         title: "Шлифуем и выдаём паспорт.",
         text: "QR-бирка расскажет, из чего сделан стул и как вернуть его на переработку.",
-        inset: {
+        photo: {
           src: "/images/process/tag.webp",
-          alt: "Бирка на верёвочке, закреплённая на слоях зелёного изделия",
+          alt: "Бирка LOOPFORM на верёвочке, закреплённая на слоях зелёного изделия",
         },
       },
     ],
@@ -485,22 +487,23 @@ export const ru: Content = {
       angle: "Угол",
     },
     models: [
-      { id: "tolqyn", name: "TOLQYN", priceValue: 69900, pricePrefix: "", weightKg: 6, fromCaps: true, adjustable: true },
-      { id: "tas", name: "TAS", priceValue: 39900, pricePrefix: "", weightKg: 4, fromCaps: true, adjustable: false },
-      { id: "biik", name: "BIIK", priceValue: 59900, pricePrefix: "", weightKg: 6.5, fromCaps: true, adjustable: false },
-      { id: "qum", name: "QUM", priceValue: 189000, pricePrefix: "", weightKg: 14, fromCaps: false, adjustable: false },
-      { id: "kol", name: "KOL", priceValue: 149000, pricePrefix: "", weightKg: 12, fromCaps: false, adjustable: false },
-      { id: "saule", name: "SAULE", priceValue: 29900, pricePrefix: "", weightKg: 1, fromCaps: false, adjustable: false },
-      { id: "japyraq", name: "JAPYRAQ", priceValue: 9900, pricePrefix: "от ", weightKg: 0.8, fromCaps: true, adjustable: false },
-      { id: "saiabaq", name: "SAIABAQ", priceValue: 390000, pricePrefix: "от ", weightKg: 40, fromCaps: true, adjustable: false },
-      { id: "ornek", name: "ORNEK", priceValue: 249000, pricePrefix: "", weightKg: 9, fromCaps: false, adjustable: false },
-      { id: "uya", name: "UYA", priceValue: 9900, pricePrefix: "", weightKg: 1, fromCaps: true, adjustable: false },
+      { id: "tolqyn", name: "TOLQYN", priceValue: 69900, pricePrefix: "", weightKg: 6, fromCaps: true, color: "cap-red", adjustable: true },
+      { id: "tas", name: "TAS", priceValue: 39900, pricePrefix: "", weightKg: 4, fromCaps: true, color: "bottle-green", adjustable: false },
+      { id: "biik", name: "BIIK", priceValue: 59900, pricePrefix: "", weightKg: 6.5, fromCaps: true, color: "cap-blue", adjustable: false },
+      { id: "qum", name: "QUM", priceValue: 189000, pricePrefix: "", weightKg: 14, fromCaps: false, color: "sand", adjustable: false },
+      { id: "kol", name: "KOL", priceValue: 149000, pricePrefix: "", weightKg: 12, fromCaps: false, color: "sand", adjustable: false },
+      { id: "saule", name: "SAULE", priceValue: 29900, pricePrefix: "", weightKg: 1, fromCaps: false, color: "cap-blue", adjustable: false },
+      { id: "japyraq", name: "JAPYRAQ", priceValue: 9900, pricePrefix: "от ", weightKg: 0.8, fromCaps: true, color: "bottle-green", adjustable: false },
+      { id: "saiabaq", name: "SAIABAQ", priceValue: 390000, pricePrefix: "от ", weightKg: 40, fromCaps: true, color: "cap-red", adjustable: false },
+      { id: "ornek", name: "ORNEK", priceValue: 249000, pricePrefix: "", weightKg: 9, fromCaps: false, color: "sand", adjustable: false },
+      { id: "uya", name: "UYA", priceValue: 9900, pricePrefix: "", weightKg: 1, fromCaps: true, color: "sun", adjustable: false },
     ],
     colors: [
       { id: "cap-red", label: "Cap Red", token: "cap-red" },
       { id: "bottle-green", label: "Bottle Green", token: "bottle-green" },
       { id: "sand", label: "Sand", token: "sand" },
       { id: "cap-blue", label: "Cap Blue", token: "cap-blue" },
+      { id: "sun", label: "Sun", token: "sun" },
       { id: "terrazzo", label: "Терраццо", token: "bone" },
     ],
     heights: [
@@ -536,9 +539,67 @@ export const ru: Content = {
   manifesto: {
     lines: ["НЕ ВЫБРАСЫВАЙ.", "ПЕРЕРОЖДАЙ.", "ПЕЧАТАЙ."],
     imagePath: "/images/manifesto.webp",
-    imageAlt: "люди в кофейне Астаны на табуретах TAS",
-    imageCaption: "Изображение создано ИИ",
+    imageAlt: "Предметы «Коллекции 01» в один ряд на белом фоне",
     pilotCall: "Ищем партнёров для пилота",
+  },
+
+  philosophy: {
+    eyebrow: "Философия",
+    title: "LOOPFORM = loop + form",
+    lead: "Петля, замкнутый цикл, и форма. Мы печатаем дизайнерскую мебель на 3D-принтере из переработанного пластика Казахстана.",
+    paragraphs: [
+      "Цикл замкнут: отходы печати и вернувшиеся изделия снова идут в дробилку. Именно эта петля дала бренду имя LOOP.",
+      "Без стыда и нравоучений про экологию. Мы говорим о дизайне и гордости за локальное производство. Наша ставка: не дёшево, а уникально и с историей.",
+    ],
+    principles: [
+      {
+        title: "Цикл не обрывается",
+        text: "Сломанный стул мы заберём и напечатаем заново. Верните его нам и получите скидку на новую модель.",
+      },
+      {
+        title: "Имена из степи",
+        text: "Каждая модель названа казахским словом из природы степи, и это отличает бренд от европейских студий.",
+      },
+      {
+        title: "Цвет без краски",
+        text: "Палитра взята из цветов настоящих крышек и бутылок. Цвет изделия дают сами крышки.",
+      },
+      {
+        title: "Честно про ограничения",
+        text: "Каждый слой виден — это не брак, а подпись принтера.",
+      },
+    ],
+  },
+
+  advantages: {
+    eyebrow: "Почему LOOPFORM",
+    title: "Формы и кастомизация, как у дизайн-студий, по цене в тенге и из местного сырья.",
+    items: [
+      {
+        title: "Печать без нити",
+        text: "Принтер сразу плавит гранулы или дроблёные хлопья пластика. По данным производителя WASP, такая печать обходится примерно в 10 раз дешевле филамента и допускает до 100% переработанного сырья.",
+      },
+      {
+        title: "Без склада",
+        text: "Печать под заказ избавляет от склада. Модели из коллекции готовы от 3 дней.",
+      },
+      {
+        title: "Цена ниже европейской",
+        text: "Стул TOLQYN стоит 69 900 ₸. Это примерно €130, то есть в два–шесть раз дешевле европейских аналогов.",
+      },
+      {
+        title: "Форма и размер под заказ",
+        text: "Печать даёт объёмные органичные формы и размер под заказ. Цвет и фактуру можно собрать в конфигураторе.",
+      },
+      {
+        title: "Паспорт у каждого изделия",
+        text: "Сколько бутылок в нём, откуда пластик и как сдать его обратно на переработку. Всё это рассказывает QR-бирка.",
+      },
+      {
+        title: "Проверено нагрузкой",
+        text: "Нагрузка вдоль слоёв держится лучше, чем поперёк, поэтому каждая модель проходит тест нагрузкой до продажи.",
+      },
+    ],
   },
 
   business: {
@@ -630,6 +691,76 @@ export const ru: Content = {
     ],
   },
 
+  competition: {
+    eyebrow: "Конкуренция",
+    title: "Место между импортом и дизайн-студиями",
+    lead: "В Казахстане прямой конкурент один — Rocket Plastic, и он не использует 3D-печать. В мире нишу занимают дизайн-студии с европейскими и американскими ценами.",
+    columns: { name: "Кто", fact: "Что делает", answer: "Чем отличается LOOPFORM" },
+    rows: [
+      {
+        name: "Импортная мебель",
+        place: "весь Казахстан",
+        fact: "Массовая мебель для гостиной и столовой, 90% сегмента",
+        answer: "Не конкурируем по цене. Продаём историю, уникальность и локальность",
+        source: { label: "Inbusiness", url: "https://inbusiness.kz/ru/news/roznichnye-ceny-na-mebel-dlya-doma-vyrosli-na-6-za-god" },
+      },
+      {
+        name: "Rocket Plastic",
+        place: "Алматы, с 2018 года",
+        fact: "Столы, стулья, полки и скамьи на станках по открытым чертежам Precious Plastic",
+        answer: "Печать даёт объёмные органичные формы и размер под заказ",
+        source: { label: "Forbes.kz", url: "https://forbes.kz/articles/plastik-kury-ne-klyuyut-kak-kazahstanets-prevratil-othody-v-biznes-1463e1" },
+      },
+      {
+        name: "Dirk van der Kooij",
+        place: "Амстердам",
+        fact: "Кресла и столы, напечатанные роботом: Chubby Chair ~€800, RvR Chair €357",
+        answer: "Локальная цена в тенге, доставка по Казахстану",
+        source: { label: "Skyrye Design", url: "https://skyryedesign.com/?p=116274" },
+      },
+      {
+        name: "The New Raw",
+        place: "Роттердам / Салоники",
+        fact: "Роботизированная печать городской мебели из местного пластика",
+        answer: "Скамьи для акиматов и дворов ЖК",
+        source: { label: "3DPrinting.com", url: "https://3dprinting.com/news/the-new-raw-3d-prints-swinging-public-seats-from-rotterdam-harbour-rope/" },
+      },
+      {
+        name: "Model No.",
+        place: "Окленд, США",
+        fact: "Печать из растительного PLA с массивом дерева: стул Cynara $429",
+        answer: "Серия «печать + дерево»: тёплая столешница на печатном основании",
+        source: { label: "Furniture Today", url: "https://www.furnituretoday.com/outdoor-furniture/model-no-adds-3d-printed-outdoor-line" },
+      },
+      {
+        name: "Gantri",
+        place: "Сан-Франциско",
+        fact: "Светильники, напечатанные под заказ, до $300",
+        answer: "Коллекции студентов-дизайнеров с роялти и печатью без склада",
+        source: { label: "All3DP", url: "https://all3dp.com/4/gantri-3d-prints-sustainable-lamps-imagined-designers-worldwide/" },
+      },
+    ],
+    note: "Rocket Plastic сам планирует перейти на 3D-печать, так что ниша недолго будет свободной. Поэтому его выгоднее сделать партнёром, чем соперником: у них налажен сбор и дробление пластика.",
+    demandTitle: "Почему сейчас",
+    demand: [
+      {
+        value: "90%",
+        label: "рынка мебели для гостиной и столовой у импортёров",
+        source: { label: "Inbusiness", url: "https://inbusiness.kz/ru/news/roznichnye-ceny-na-mebel-dlya-doma-vyrosli-na-6-za-god" },
+      },
+      {
+        value: "+24%",
+        label: "продажи кофе в 2025 году, а кофейням нужна фотогеничная мебель",
+        source: { label: "Finratings", url: "https://finratings.kz/news/13182-skolko-kazakhstantsy-potratili-na-kofe-v-2025-godu/" },
+      },
+      {
+        value: "73%",
+        label: "зумеров готовы платить больше за экологичные товары",
+        source: { label: "Coherent Market Insights", url: "https://www.coherentmarketinsights.com/blog/consumer-goods/how-millennials-and-gen-z-are-driving-home-decor-trends-3139" },
+      },
+    ],
+  },
+
   faq: {
     eyebrow: "FAQ",
     title: "ЕСТЬ ВОПРОСЫ",
@@ -688,6 +819,7 @@ export const ru: Content = {
       {
         title: "Компания",
         links: [
+          { label: "Философия", target: "philosophy" },
           { label: "Как сделано", target: "process" },
           { label: "Для бизнеса", target: "business" },
           { label: "Сдать пластик", target: "cta" },
