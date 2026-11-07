@@ -193,6 +193,19 @@ try {
       }),
     )
     report("configurator model tiles share one size", tiles.length === 10 && new Set(tiles).size === 1 && tiles[0].split("x")[0] === tiles[0].split("x")[1], [...new Set(tiles)].join(" "))
+    const moved = await page.evaluate(async () => {
+      const top = document.querySelector("[data-section='process']").getBoundingClientRect().top + window.scrollY
+
+      window.__lenis.scrollTo(top, { immediate: true, force: true })
+      await new Promise((resolve) => setTimeout(resolve, 900))
+
+      return document.querySelector("[data-anchor='process-caps']").getBoundingClientRect().toJSON()
+    })
+    const clip = { x: moved.x, y: moved.y, width: moved.width, height: moved.height }
+    const firstFrame = await page.screenshot({ clip })
+    await page.waitForTimeout(1200)
+    const secondFrame = await page.screenshot({ clip })
+    report("process caps keep moving", !firstFrame.equals(secondFrame))
     report("no console errors on desktop", errors.length === 0, errors.slice(0, 3).join(" | "))
     await context.close()
   }

@@ -141,6 +141,11 @@ export const footerPhysics = {
   flakesMobile: 40,
 } as const
 
+export const capPileCounts = {
+  desktop: 340,
+  mobile: 240,
+} as const
+
 export const particleCounts = {
   capsDesktop: 240,
   capsMobile: 120,
