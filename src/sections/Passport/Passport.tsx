@@ -66,7 +66,7 @@ export function Passport() {
     <StackSection
       id="passport"
       theme="dark"
-      label={ru.sections[6]?.title ?? ""}
+      label={ru.sections[7]?.title ?? ""}
       heightVh={sectionHeights.passport}
       overlap
       sectionRef={sectionRef}

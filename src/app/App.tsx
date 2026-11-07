@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react"
 import { AppProviders } from "@/app/AppProviders"
 import { Header } from "@/components/Header/Header"
+import { MeltHeading } from "@/components/MeltHeading/MeltHeading"
 import { MiniProductCard } from "@/components/MiniProductCard/MiniProductCard"
 import { Preloader } from "@/components/Preloader/Preloader"
 import { ProgressRail } from "@/components/ProgressRail/ProgressRail"
@@ -16,6 +17,7 @@ import { Hero } from "@/sections/Hero/Hero"
 import { Intro } from "@/sections/Intro/Intro"
 import { Manifesto } from "@/sections/Manifesto/Manifesto"
 import { Market } from "@/sections/Market/Market"
+import { Melt } from "@/sections/Melt/Melt"
 import { Passport } from "@/sections/Passport/Passport"
 import { Problem } from "@/sections/Problem/Problem"
 import { Process } from "@/sections/Process/Process"
@@ -44,6 +46,7 @@ function App() {
         <Collection />
         <Catalog />
         <Problem />
+        <Melt />
         <Process />
         <Passport />
         <Configurator />
@@ -57,6 +60,7 @@ function App() {
       <Suspense fallback={null}>
         <Stage />
       </Suspense>
+      <MeltHeading />
       <MiniProductCard />
       <RotatingBadge />
       <ProgressRail />

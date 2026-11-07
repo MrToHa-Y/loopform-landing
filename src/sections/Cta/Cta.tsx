@@ -36,7 +36,7 @@ export function Cta() {
   }
 
   return (
-    <StackSection id="cta" theme="light" label={ru.sections[12]?.title ?? ""} className={styles.root}>
+    <StackSection id="cta" theme="light" label={ru.sections[13]?.title ?? ""} className={styles.root}>
       <div className={styles.inner}>
         <h2 className={styles.title}>{cta.title}</h2>
         <form className={styles.form} noValidate onSubmit={handleSubmit}>

@@ -161,7 +161,7 @@ try {
       link: [...document.querySelectorAll("[data-section='configurator'] a")].find((node) => node.textContent === "Отправить заявку").href,
     }))
     const decoded = Buffer.from(configurator.link.split("start=")[1], "base64url").toString()
-    report("configurator recalculates and builds link", configurator.price === "75 700 ₸" && decoded === "terrazzo.bar.relief.felt.135", `${configurator.price} ${decoded}`)
+    report("configurator recalculates and builds link", configurator.price === "75 700 ₸" && decoded === "tolqyn.terrazzo.bar.relief.felt.135", `${configurator.price} ${decoded}`)
 
     report("no console errors on desktop", errors.length === 0, errors.slice(0, 3).join(" | "))
     await context.close()
@@ -183,7 +183,7 @@ try {
       await page.waitForTimeout(150)
 
       const position = await page.evaluate(() => Math.round(window.scrollY))
-      const counter = await page.evaluate(() => [...document.querySelectorAll("p")].map((node) => node.textContent).find((text) => /^\d\d \/ 14$/.test(text ?? "")))
+      const counter = await page.evaluate(() => [...document.querySelectorAll("p")].map((node) => node.textContent).find((text) => /^\d\d \/ 15$/.test(text ?? "")))
 
       seen.push(counter)
 
@@ -196,7 +196,7 @@ try {
 
     const atEnd = await page.evaluate(() => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4)
     const unique = new Set(seen)
-    report("presentation walks every section to the end", headerHidden && atEnd && unique.size >= 13, `frames ${seen.length}, sections ${unique.size}, end ${atEnd}`)
+    report("presentation walks every section to the end", headerHidden && atEnd && unique.size >= 14, `frames ${seen.length}, sections ${unique.size}, end ${atEnd}`)
 
     await page.keyboard.press("ArrowLeft")
     await page.waitForTimeout(300)
@@ -228,7 +228,7 @@ try {
   {
     const { context, page, errors } = await open(browser, { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
     const sticky = await page.evaluate(() =>
-      ["collection", "problem", "process", "passport", "manifesto"].every(
+      ["collection", "problem", "melt", "process", "passport", "configurator", "manifesto"].every(
         (id) => getComputedStyle(document.querySelector(`[data-section='${id}'] [data-sticky]`)).position === "sticky",
       ),
     )
@@ -243,7 +243,9 @@ try {
     const phoneBackground = await page.evaluate(() => getComputedStyle(document.querySelector("[data-section='collection']")).getPropertyValue("--collection-bg"))
     report("phone collection switches models", phoneBackground === "rgb(47, 111, 78)", phoneBackground)
 
-    await jump(page, 1180)
+    const processTop = await page.evaluate(() => (document.querySelector("[data-section='process']").getBoundingClientRect().top + window.scrollY) / window.innerHeight * 100)
+
+    await jump(page, processTop + 100)
     await page.waitForTimeout(1200)
     const shift = await page.evaluate(() => new DOMMatrix(getComputedStyle(document.querySelector("[data-section='process'] ol")).transform).m41)
     report("phone process moves horizontally", shift < -100, String(Math.round(shift)))
@@ -254,6 +256,35 @@ try {
       return { gap: cards[1].left - cards[0].right, inside: caption.right <= cards[0].right }
     })
     report("phone catalog captions stay inside their card", catalog.gap >= 12 && catalog.inside, JSON.stringify(catalog))
+    const configuratorTop = await page.evaluate(() => (document.querySelector("[data-section='configurator']").getBoundingClientRect().top + window.scrollY) / window.innerHeight * 100)
+
+    await jump(page, configuratorTop + 20)
+    await page.waitForTimeout(1500)
+    const fits = await page.evaluate(() => {
+      const section = document.querySelector("[data-section='configurator']")
+      const inside = (selector) => {
+        const element = [...section.querySelectorAll(selector)].find((node) => node.getClientRects().length > 0)
+        const rect = element?.getBoundingClientRect()
+        return Boolean(rect) && rect.top >= 0 && rect.bottom <= window.innerHeight
+      }
+
+      return { anchor: inside("[data-anchor='configurator-product']"), tabs: inside("[role='tablist']"), results: inside("dl"), submit: inside("a") }
+    })
+    report("phone configurator fits one screen", Object.values(fits).every(Boolean), JSON.stringify(fits))
+
+    const angleVisible = await page.evaluate(() => {
+      const button = [...document.querySelectorAll("[data-section='configurator'] button")].find((node) => node.textContent === "90°")
+      const rect = button.getBoundingClientRect()
+      const anchor = document.querySelector("[data-anchor='configurator-product']").getBoundingClientRect()
+      return rect.height > 0 && rect.bottom <= window.innerHeight && anchor.height > 200
+    })
+    report("phone angle buttons sit beside the model", angleVisible)
+
+    await page.evaluate(() => [...document.querySelectorAll("[data-section='configurator'] button")].find((node) => node.textContent === "Модель").click())
+    await page.evaluate(() => [...document.querySelectorAll("[data-section='configurator'] button")].find((node) => node.textContent.includes("QUM")).click())
+    await page.waitForTimeout(1200)
+    const switched = await page.evaluate(() => document.querySelector("[data-section='configurator'] h2").textContent + " | " + document.querySelector("[data-section='configurator'] dd .sr-only").textContent)
+    report("phone configurator switches model", switched.includes("QUM") && switched.includes("189 000"), switched)
     report("no console errors on phone", errors.length === 0, errors.slice(0, 3).join(" | "))
     await context.close()
   }

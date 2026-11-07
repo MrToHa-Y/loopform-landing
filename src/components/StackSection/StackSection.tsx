@@ -11,6 +11,7 @@ interface StackSectionProps {
   themeOffsetVh?: number
   className?: string
   stickyClassName?: string
+  leading?: ReactNode
   sectionRef?: RefObject<HTMLElement | null>
   children: ReactNode
 }
@@ -24,6 +25,7 @@ export function StackSection({
   themeOffsetVh,
   className,
   stickyClassName,
+  leading,
   sectionRef,
   children,
 }: StackSectionProps) {
@@ -49,6 +51,7 @@ export function StackSection({
       className={sectionClasses.join(" ")}
       style={style}
     >
+      {leading}
       {heightVh ? (
         <div data-sticky className={`${styles.sticky} ${stickyClassName ?? ""}`}>
           {children}

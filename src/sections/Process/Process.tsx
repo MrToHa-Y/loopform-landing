@@ -81,12 +81,13 @@ export function Process() {
     <StackSection
       id="process"
       theme="light"
-      label={ru.sections[5]?.title ?? ""}
+      label={ru.sections[6]?.title ?? ""}
       heightVh={sectionHeights.process}
       overlap
       sectionRef={sectionRef}
       className={styles.root}
       stickyClassName={styles.stage}
+      leading={<div data-anchor="process-top" className={styles.seam} aria-hidden="true" />}
     >
       <h2 className={styles.title}>{process.title}</h2>
       <ol ref={trackRef} className={styles.track}>

@@ -52,9 +52,10 @@ export const sectionHeights = {
   collection: 600,
   catalog: 130,
   problem: 350,
+  melt: 400,
   process: 400,
   passport: 300,
-  configurator: 120,
+  configurator: 200,
   manifesto: 250,
   business: 100,
   market: 100,
@@ -81,6 +82,10 @@ export const segments = {
     problemRise: [70, 130],
     problemOut: [130, 230],
   },
+  melt: {
+    meltEnter: [-100, 0],
+    meltFlow: [0, 300],
+  },
   process: {
     processEnter: [-100, 0],
     processTrack: [0, 200],
@@ -88,13 +93,12 @@ export const segments = {
   },
   passport: {
     passportEnter: [-100, 0],
-    passportStream: [0, 100],
+    passportStream: [0, 130],
     passportList: [0, 160],
-    passportLeave: [100, 170],
   },
   configurator: {
     configuratorEnter: [-80, 0],
-    configuratorLeave: [40, 120],
+    configuratorLeave: [100, 200],
   },
   manifesto: {
     manifestoLines: [-100, 150],
@@ -121,6 +125,7 @@ export const presentationPoints = {
   collectionSteps: 4,
   problemHeap: 60,
   problemShape: 140,
+  meltDeep: 130,
   processSteps: 5,
   processSpan: 200,
   passportItems: 4,

@@ -1,4 +1,4 @@
-import { Vector3 } from "three"
+import { Matrix4, Vector3 } from "three"
 import type { ParticleStateName } from "@/three/particles/particleStates"
 
 export interface ParticleLayer {
@@ -15,8 +15,10 @@ export const particleDirective = {
   silhouetteCenter: new Vector3(),
   silhouetteScale: 1,
   silhouetteRotation: 0,
-  streamFrom: new Vector3(),
-  streamTo: new Vector3(),
+  morph: 0,
+  morphFrom: new Matrix4(),
+  morphTo: new Matrix4(),
+  morphAxis: 0,
   spin: 1,
   paletteMode: false,
 }
@@ -41,4 +43,16 @@ export const shardDirective = {
 
 export const processDirective = {
   visible: false,
+}
+
+export const meltDirective = {
+  visible: false,
+  x: 0,
+  y: 0,
+  radius: 1,
+  amplitude: 0.05,
+  flow: 0,
+  worldWidth: 1,
+  clipTop: 0,
+  clipBottom: 0,
 }

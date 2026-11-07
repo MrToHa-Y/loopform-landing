@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from "react"
 import { Color, MathUtils } from "three"
 import type { Group, PointLight } from "three"
 import { ru } from "@/content/ru"
+import type { CatalogModelId } from "@/content/types"
 import { useScrollStore } from "@/state/scrollStore"
 import { actorModels, actorTargets } from "@/three/actors"
 import { worldHeight } from "@/three/anchors"
@@ -14,6 +15,7 @@ import { paletteColor, speckleColors } from "@/three/palette"
 
 interface ActorProps {
   id: ActorId
+  model?: CatalogModelId
 }
 
 const minBandPixels = 4
@@ -23,8 +25,8 @@ const stretchLimit = 75 / 45
 const colorDamping = 7
 const stateDamping = 5
 
-export function Actor({ id }: ActorProps) {
-  const model = actorModels[id]
+export function Actor({ id, model: modelOverride }: ActorProps) {
+  const model = modelOverride ?? actorModels[id]
   const parts = getModelParts(model)
   const groupRef = useRef<Group>(null)
   const pivotRef = useRef<Group>(null)
@@ -143,7 +145,7 @@ export function Actor({ id }: ActorProps) {
       uniforms.uRelief.value = MathUtils.damp(uniforms.uRelief.value, config.texture === "relief" ? 1.6 : 0.35, stateDamping, delta)
       uniforms.uLegStretch.value = MathUtils.damp(
         uniforms.uLegStretch.value,
-        config.height === "bar" ? stretchLimit : 1,
+        model === "tolqyn" && config.height === "bar" ? stretchLimit : 1,
         stateDamping,
         delta,
       )

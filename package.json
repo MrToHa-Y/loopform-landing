@@ -10,7 +10,8 @@
     "typecheck": "tsc -b",
     "shoot": "node scripts/shoot.mjs",
     "verify": "node scripts/verify.mjs",
-    "fps": "node scripts/fps.mjs"
+    "fps": "node scripts/fps.mjs",
+    "gestures": "node scripts/gestures.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

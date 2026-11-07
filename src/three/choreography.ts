@@ -1,11 +1,13 @@
+import { Euler, Quaternion, Vector3, Matrix4 } from "three"
 import { motion } from "@/animation/tokens"
-import { readProgress, collectionRig, heroRig, useScrollStore } from "@/state/scrollStore"
+import { readProgress, collectionRig, configuratorRig, configuratorView, heroRig, useScrollStore } from "@/state/scrollStore"
 import { actorIds, actorModels, actorTargets } from "@/three/actors"
 import type { ActorId, ActorTarget } from "@/three/actors"
-import { mixRects, pixelsToWorld, readAnchor, worldHeight } from "@/three/anchors"
+import { mixRects, readAnchor, worldHeight } from "@/three/anchors"
 import type { WorldRect } from "@/three/anchors"
-import { nozzleDirective, particleDirective, processDirective, shadowDirective, shardDirective } from "@/three/directives"
+import { meltDirective, nozzleDirective, particleDirective, processDirective, shadowDirective, shardDirective } from "@/three/directives"
 import { getModelParts } from "@/three/models/modelLibrary"
+import { morphTiming } from "@/three/particles/particleStates"
 
 export interface StageSize {
   width: number
@@ -14,6 +16,11 @@ export interface StageSize {
 }
 
 const degrees = Math.PI / 180
+const morphEuler = new Euler()
+const morphQuaternion = new Quaternion()
+const morphPosition = new Vector3()
+const morphScale = new Vector3()
+const morphPivot = new Matrix4()
 const collectionActors: ActorId[] = ["tolqyn", "tas", "qum", "saule"]
 const collectionFill = [1, 0.74, 0.86, 0.78]
 
@@ -203,7 +210,8 @@ function updateProblem(size: StageSize) {
   particleDirective.paletteMode = true
 
   if (out > 0) {
-    setParticles("silhouette", "hidden", range(out, 0.3, 0.75))
+    particleDirective.nozzle.set(meltDirective.x, meltDirective.y, 0)
+    setParticles("silhouette", "intake", range(out, 0.2, 0.8))
   } else if (rise > 0) {
     setParticles("heap", "silhouette", rise)
   } else {
@@ -250,65 +258,66 @@ function updateProcess(size: StageSize) {
   }
 }
 
+function composeMorph(target: Matrix4, actor: ActorTarget, height: number) {
+  morphEuler.set(actor.rotationX, actor.rotationY, actor.rotationZ)
+  morphQuaternion.setFromEuler(morphEuler)
+  morphPosition.set(actor.x, actor.y, actor.z)
+  morphScale.setScalar(actor.scale)
+  target.compose(morphPosition, morphQuaternion, morphScale)
+  target.multiply(morphPivot.makeTranslation(0, -height / 2, 0))
+}
+
 function updatePassport(size: StageSize) {
   const { width, height } = size
   const enter = readProgress("passportEnter")
-  const leave = readProgress("passportLeave")
-  const stream = readProgress("passportStream")
+  const morph = readProgress("passportStream")
   const chairAnchor = readAnchor("passport-chair", width, height, true)
   const stoolAnchor = readAnchor("passport-stool", width, height, true)
   const seam = readAnchor("configurator-seam", width, height)
 
   if (enter <= 0 || !chairAnchor || !stoolAnchor || !seam) {
-    return false
+    return
   }
 
-  const seamVisible = seam.bottom > -height * 0.3
-  let active = false
+  const chair = place("tolqyn", chairAnchor)
+  const arrive = smooth(range(enter, 0.55, 1))
+  const dissolve = range(morph, morphTiming.releaseStart, morphTiming.releaseStart + morphTiming.releaseSpan)
 
-  if (leave < 1) {
-    const chair = place("tolqyn", chairAnchor)
-    const arrive = smooth(range(enter, 0.55, 1))
+  chair.y += (1 - arrive) * worldHeight * 0.9
+  chair.rotationY = -20 * degrees
+  chair.rotationZ = 120 * degrees
+  chair.print = 1 - dissolve
+  chair.direction = -1
+  chair.printStiffness = 30
+  chair.visible = arrive > 0.001 && dissolve < 0.999
 
-    chair.visible = arrive > 0.001
-    chair.y += (1 - arrive) * worldHeight * 0.9 + leave * worldHeight * 0.9
-    chair.rotationY = -20 * degrees
-    chair.rotationZ = 120 * degrees
-    chair.print = 1
-    active = true
+  if (seam.bottom < -height * 0.3 || enter < 1) {
+    return
   }
 
-  if (seamVisible && enter >= 1) {
-    const unit = pixelsToWorld(height)
-    const stoolRect = { ...stoolAnchor }
-    const seamWorldY = seam.y
+  const stoolRect = { ...stoolAnchor }
 
-    if (seamWorldY > stoolRect.y) {
-      stoolRect.y = seamWorldY
-    }
-
-    const stool = place("stool", stoolRect)
-
-    stool.rotationY = 10 * degrees
-    stool.rotationZ = 0
-    stool.print = stream
-    stool.stiffness = 30
-    setNozzle("stool")
-
-    if (stream > 0 && stream < 1) {
-      const chair = actorTargets.tolqyn
-
-      particleDirective.streamFrom.set(chair.x - chair.scale * 0.1, chair.y - chair.scale * 0.2, 0.3)
-      particleDirective.streamTo.copy(nozzleDirective.position)
-      particleDirective.streamTo.y += 12 * unit
-      particleDirective.paletteMode = true
-      setParticles("hidden", "hidden", 0, "stream", "stream")
-    }
-
-    active = true
+  if (seam.y > stoolRect.y) {
+    stoolRect.y = seam.y
   }
 
-  return active
+  const stool = place("stool", stoolRect)
+
+  stool.rotationY = 10 * degrees
+  stool.rotationZ = 0
+  stool.print = range(morph, morphTiming.coverStart, morphTiming.coverStart + morphTiming.coverSpan)
+  stool.printStiffness = 30
+  stool.stiffness = 30
+  stool.visible = stool.print > 0.002 || (morph > 0 && morph < 1)
+
+  if (morph > 0 && morph < 1) {
+    composeMorph(particleDirective.morphFrom, chair, getModelParts("tolqyn").size.y)
+    composeMorph(particleDirective.morphTo, stool, getModelParts("tas").size.y)
+    particleDirective.morph = morph
+    particleDirective.morphAxis = stool.x
+    particleDirective.paletteMode = true
+    setParticles("morph", "morph", 1)
+  }
 }
 
 function updateConfigurator(size: StageSize) {
@@ -320,17 +329,52 @@ function updateConfigurator(size: StageSize) {
     return
   }
 
-  const config = useScrollStore.getState().configurator
-  const chair = place("configChair", anchor, 0.88)
+  const view = configuratorView
+  const chair = place("configChair", anchor, 0.74)
 
-  chair.rotationY = (-25 + config.angle + config.dragAngle) * degrees
+  chair.x += view.x
+  chair.y += view.y
+  chair.scale *= view.zoom
+  chair.rotationX = view.pitch * degrees
+  chair.rotationY = (-25 + view.yaw) * degrees
   chair.rotationZ = 0
-  chair.rotationStiffness = 5
-  chair.print = smooth(range(enter, 0.2, 1))
+  chair.rotationStiffness = 9
+  chair.print = smooth(range(enter, 0.2, 1)) * configuratorRig.print
   chair.stiffness = 26
-  chair.printStiffness = 12
+  chair.printStiffness = 14
   setNozzle("configChair")
-  setShadow("configChair", 0.45 * (1 - leave) * chair.print)
+  setShadow("configChair", 0.45 * (1 - leave) * chair.print * (view.pitch === 0 ? 1 : 0.5))
+}
+
+function updateMelt(size: StageSize) {
+  const { width, height } = size
+  const melt = meltDirective
+  const anchor = readAnchor("melt-product", width, height)
+  const top = readAnchor("melt-top", width, height)
+  const seam = readAnchor("process-top", width, height)
+  const enter = readProgress("meltEnter")
+
+  melt.visible = false
+
+  if (enter <= 0 || !anchor || !top || !seam || seam.top <= 0) {
+    return
+  }
+
+  const flow = readProgress("meltFlow")
+  const worldWidth = worldHeight * (width / height)
+  const baseRadius = Math.min(worldHeight * 0.3, worldWidth * 0.4)
+  const swell = smooth(range(flow, 0, 0.5))
+  const flood = smooth(range(flow, 0.56, 1))
+
+  melt.visible = true
+  melt.flow = flow
+  melt.worldWidth = worldWidth
+  melt.radius = baseRadius * (1 + swell * 0.28 + flood * 1.4)
+  melt.x = anchor.x - flood * worldWidth * 0.14
+  melt.y = anchor.y - swell * worldHeight * 0.03 - flood * worldHeight * 0.1
+  melt.amplitude = 0.03 + swell * 0.05 + flood * 0.17
+  melt.clipTop = Math.max(top.top, 0)
+  melt.clipBottom = Math.min(seam.top, height)
 }
 
 function updateBusiness(size: StageSize) {
@@ -380,6 +424,23 @@ function placeStatic(id: ActorId, anchor: string, size: StageSize, rotationY: nu
 }
 
 function updateStatic(size: StageSize) {
+  const meltAnchor = readAnchor("melt-product", size.width, size.height)
+
+  meltDirective.visible = inView(meltAnchor, size.height) && meltAnchor !== null
+
+  if (meltAnchor) {
+    const worldWidth = worldHeight * (size.width / size.height)
+
+    meltDirective.x = meltAnchor.x
+    meltDirective.y = meltAnchor.y
+    meltDirective.radius = Math.min(worldHeight * 0.3, worldWidth * 0.4)
+    meltDirective.amplitude = 0.05
+    meltDirective.flow = 0
+    meltDirective.worldWidth = worldWidth
+    meltDirective.clipTop = 0
+    meltDirective.clipBottom = size.height
+  }
+
   const heroVisible = placeStatic("tolqyn", "hero-product", size, -25, 0, 0.9)
 
   if (heroVisible) {
@@ -404,9 +465,7 @@ function updateStatic(size: StageSize) {
   placeStatic("processPrint", "process-4", size, -28, 0, 0.9)
   placeStatic("processFinal", "process-5", size, -28, 0, 0.9)
 
-  const config = useScrollStore.getState().configurator
-
-  actorTargets.configChair.rotationY = (-25 + config.angle + config.dragAngle) * degrees
+  actorTargets.configChair.rotationY = (-25 + configuratorView.yaw) * degrees
   processDirective.visible = inView(readAnchor("process-1", size.width, size.height), size.height)
 }
 
@@ -427,6 +486,7 @@ export function runChoreography(size: StageSize) {
   setParticles("hidden", "hidden", 0)
 
   updateHeroAndCollection(size)
+  updateMelt(size)
   updateProblem(size)
   updateProcess(size)
   updatePassport(size)

@@ -12,6 +12,7 @@
   gap: 4vh;
   padding-top: calc(var(--header-height) + 5vh);
   color: var(--color-bone);
+  touch-action: pan-y pinch-zoom;
   background-color: var(--color-graphite);
 }
 

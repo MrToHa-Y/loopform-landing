@@ -1,7 +1,22 @@
 import { Vector3 } from "three"
+import type { Matrix4 } from "three"
 import { createRandom } from "@/three/random"
 
-export type ParticleStateName = "cloud" | "intake" | "fall" | "heap" | "silhouette" | "stream" | "hidden"
+export type ParticleStateName = "cloud" | "intake" | "fall" | "heap" | "silhouette" | "morph" | "hidden"
+
+export const morphTiming = {
+  releaseStart: 0.02,
+  releaseSpan: 0.5,
+  flight: 0.3,
+  coverStart: 0.42,
+  coverSpan: 0.56,
+} as const
+
+export interface SurfacePair {
+  from: Vector3
+  to: Vector3
+  rank: number
+}
 
 export interface Particle {
   scale: number
@@ -18,13 +33,21 @@ export interface Particle {
   heapDepth: number
   skyOffset: number
   surface: Vector3
+  surfaceTo: Vector3
+  morphDelay: number
+  morphCover: number
   spinX: number
   spinY: number
   spinZ: number
+  offsetX: number
+  offsetY: number
+  velocityX: number
+  velocityY: number
 }
 
 export interface ParticleContext {
   time: number
+  delta: number
   worldWidth: number
   worldHeight: number
   center: Vector3
@@ -32,18 +55,26 @@ export interface ParticleContext {
   silhouetteCenter: Vector3
   silhouetteScale: number
   silhouetteRotation: number
-  streamFrom: Vector3
-  streamTo: Vector3
+  morph: number
+  morphFrom: Matrix4
+  morphTo: Matrix4
+  morphAxis: number
   pointer: Vector3
+  pointerVelocity: Vector3
+  pointerPresence: number
+  pointerPulse: number
+  pointerRadius: number
   radiusScale: number
 }
 
-export function createParticles(count: number, scaleMin: number, scaleMax: number, surface: Vector3[], seed: number) {
+export function createParticles(count: number, scaleMin: number, scaleMax: number, pairs: SurfacePair[], seed: number) {
   const random = createRandom(seed)
   const particles: Particle[] = []
 
   for (let index = 0; index < count; index += 1) {
     const heapX = random() * 2 - 1
+    const pair = pairs[index % Math.max(pairs.length, 1)]
+    const rank = pair?.rank ?? 0
 
     particles.push({
       scale: scaleMin + random() * (scaleMax - scaleMin),
@@ -59,17 +90,23 @@ export function createParticles(count: number, scaleMin: number, scaleMax: numbe
       heapHeight: random() * random() * (1 - Math.abs(heapX) * 0.7),
       heapDepth: (random() * 2 - 1) * 0.5,
       skyOffset: random() * 3,
-      surface: surface[index % Math.max(surface.length, 1)] ?? new Vector3(),
+      surface: pair?.from ?? new Vector3(),
+      surfaceTo: pair?.to ?? new Vector3(),
+      morphDelay: morphTiming.releaseStart + rank * morphTiming.releaseSpan,
+      morphCover: morphTiming.coverStart + rank * morphTiming.coverSpan + 0.02,
       spinX: (random() * 2 - 1) * 1.2,
       spinY: (random() * 2 - 1) * 1.2,
       spinZ: (random() * 2 - 1) * 1.2,
+      offsetX: 0,
+      offsetY: 0,
+      velocityX: 0,
+      velocityY: 0,
     })
   }
 
   return particles
 }
 
-const repulsionRadius = 0.8
 const scratch = new Vector3()
 
 export function sampleState(state: ParticleStateName, particle: Particle, context: ParticleContext, out: Vector3) {
@@ -84,16 +121,6 @@ export function sampleState(state: ParticleStateName, particle: Particle, contex
         context.center.y + particle.cloudHeight * context.radiusScale + bob,
         Math.sin(angle) * radius * 0.7 + particle.cloudDepth,
       )
-
-      scratch.copy(out).sub(context.pointer)
-      scratch.z = 0
-
-      const distance = scratch.length()
-
-      if (distance < repulsionRadius && distance > 0.0001) {
-        const push = (1 - distance / repulsionRadius) ** 2 * 0.55
-        out.addScaledVector(scratch.normalize(), push)
-      }
 
       return 1
     }
@@ -128,21 +155,70 @@ export function sampleState(state: ParticleStateName, particle: Particle, contex
       )
       return 0.62
     }
-    case "stream": {
-      const phase = (context.time * (0.32 + particle.seedA * 0.26) + particle.seedB) % 1
-      const sway = Math.sin(phase * 9 + particle.seedA * 6.28) * 0.07 * (1 - phase)
+    case "morph": {
+      const local = Math.min(1, Math.max(0, (context.morph - particle.morphDelay) / morphTiming.flight))
 
-      out.lerpVectors(context.streamFrom, context.streamTo, phase * phase * 0.6 + phase * 0.4)
-      out.x += sway + (particle.seedB - 0.5) * 0.16
-      out.z += (particle.seedA - 0.5) * 0.3
+      out.copy(particle.surface).applyMatrix4(context.morphFrom)
 
-      return phase > 0.94 ? 0 : 1
+      if (local <= 0) {
+        return 0
+      }
+
+      const eased = local * local * (3 - 2 * local)
+      const bend = Math.sin(eased * Math.PI)
+      const neck = bend * bend * 0.86
+
+      scratch.copy(particle.surfaceTo).applyMatrix4(context.morphTo)
+      out.lerp(scratch, eased)
+      out.x += (context.morphAxis + Math.sin(local * 9 + particle.seedA * 6.28) * 0.05 - out.x) * neck
+      out.z *= 1 - neck * 0.8
+
+      const appear = Math.min(1, local * 7)
+      const covered = context.morph > particle.morphCover ? 0 : 1
+
+      return appear * covered * 0.82
     }
     case "hidden":
       return 0
     default:
       return 0
   }
+}
+
+const flow = {
+  repel: 30,
+  drag: 7,
+  spring: 9,
+  damping: 3.6,
+  pulse: 5,
+} as const
+
+export function applyPointerFlow(particle: Particle, context: ParticleContext, out: Vector3) {
+  const delta = Math.min(context.delta, 1 / 30)
+  const x = out.x + particle.offsetX - context.pointer.x
+  const y = out.y + particle.offsetY - context.pointer.y
+  const distance = Math.hypot(x, y)
+
+  if (context.pointerPresence > 0 && distance < context.pointerRadius && distance > 0.0001) {
+    const falloff = 1 - distance / context.pointerRadius
+    const push = falloff * falloff * flow.repel * delta + context.pointerPulse * falloff * flow.pulse
+
+    particle.velocityX += (x / distance) * push + context.pointerVelocity.x * falloff * flow.drag * delta
+    particle.velocityY += (y / distance) * push + context.pointerVelocity.y * falloff * flow.drag * delta
+  }
+
+  particle.velocityX -= particle.offsetX * flow.spring * delta
+  particle.velocityY -= particle.offsetY * flow.spring * delta
+
+  const damping = Math.exp(-flow.damping * delta)
+
+  particle.velocityX *= damping
+  particle.velocityY *= damping
+  particle.offsetX += particle.velocityX * delta
+  particle.offsetY += particle.velocityY * delta
+
+  out.x += particle.offsetX
+  out.y += particle.offsetY
 }
 
 export function stagger(amount: number, delay: number, spread: number) {

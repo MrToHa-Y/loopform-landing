@@ -29,9 +29,11 @@ for (const [name, from, to] of [
   ["hero", 40, 190],
   ["collection", 205, 590],
   ["problem", 830, 980],
-  ["process", 1080, 1280],
-  ["passport", 1380, 1500],
-  ["footer", 2100, 2187],
+  ["melt", 1090, 1300],
+  ["process", 1380, 1580],
+  ["passport", 1680, 1810],
+  ["configurator", 1880, 1960],
+  ["footer", 2500, 2567],
 ]) {
   const fps = await page.evaluate(
     async ([startVh, endVh]) => {

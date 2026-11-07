@@ -29,15 +29,16 @@ export const ru: Content = {
     { id: "collection", number: "03", title: "Коллекция" },
     { id: "catalog", number: "04", title: "Каталог" },
     { id: "problem", number: "05", title: "Проблема" },
-    { id: "process", number: "06", title: "Процесс" },
-    { id: "passport", number: "07", title: "Паспорт" },
-    { id: "configurator", number: "08", title: "Конфигуратор" },
-    { id: "manifesto", number: "09", title: "Манифест" },
-    { id: "business", number: "10", title: "Для бизнеса" },
-    { id: "market", number: "11", title: "Рынок" },
-    { id: "faq", number: "12", title: "FAQ" },
-    { id: "cta", number: "13", title: "CTA" },
-    { id: "footer", number: "14", title: "Футер" },
+    { id: "melt", number: "06", title: "Расплав" },
+    { id: "process", number: "07", title: "Процесс" },
+    { id: "passport", number: "08", title: "Паспорт" },
+    { id: "configurator", number: "09", title: "Конфигуратор" },
+    { id: "manifesto", number: "10", title: "Манифест" },
+    { id: "business", number: "11", title: "Для бизнеса" },
+    { id: "market", number: "12", title: "Рынок" },
+    { id: "faq", number: "13", title: "FAQ" },
+    { id: "cta", number: "14", title: "CTA" },
+    { id: "footer", number: "15", title: "Футер" },
   ],
 
   preloader: {
@@ -373,6 +374,11 @@ export const ru: Content = {
     lead: "Мы не спасём планету стулом. Но каждый стул — это примерно 2 400 крышек, которые не попали на полигон",
   },
 
+  melt: {
+    lines: ["2 400 крышек.", "3 часа печати.", "1 стул."],
+    labels: ["Собираем.", "Дробим в хлопья.", "Печатаем слой за слоем.", "Printed from yesterday", "Waste has a new shape", "Каждый слой виден"],
+  },
+
   process: {
     title: "Как это сделано",
     steps: [
@@ -461,14 +467,35 @@ export const ru: Content = {
   },
 
   configurator: {
-    title: "Соберите свой TOLQYN",
+    titlePrefix: "Соберите свой",
     groups: {
+      model: "Модель",
       color: "Цвет",
       height: "Высота",
       texture: "Фактура слоя",
       cushion: "Подушка",
       angle: "Угол обзора",
     },
+    tabs: {
+      model: "Модель",
+      color: "Цвет",
+      height: "Высота",
+      texture: "Фактура",
+      cushion: "Подушка",
+      angle: "Угол",
+    },
+    models: [
+      { id: "tolqyn", name: "TOLQYN", priceValue: 69900, pricePrefix: "", weightKg: 6, fromCaps: true, adjustable: true },
+      { id: "tas", name: "TAS", priceValue: 39900, pricePrefix: "", weightKg: 4, fromCaps: true, adjustable: false },
+      { id: "biik", name: "BIIK", priceValue: 59900, pricePrefix: "", weightKg: 6.5, fromCaps: true, adjustable: false },
+      { id: "qum", name: "QUM", priceValue: 189000, pricePrefix: "", weightKg: 14, fromCaps: false, adjustable: false },
+      { id: "kol", name: "KOL", priceValue: 149000, pricePrefix: "", weightKg: 12, fromCaps: false, adjustable: false },
+      { id: "saule", name: "SAULE", priceValue: 29900, pricePrefix: "", weightKg: 1, fromCaps: false, adjustable: false },
+      { id: "japyraq", name: "JAPYRAQ", priceValue: 9900, pricePrefix: "от ", weightKg: 0.8, fromCaps: true, adjustable: false },
+      { id: "saiabaq", name: "SAIABAQ", priceValue: 390000, pricePrefix: "от ", weightKg: 40, fromCaps: true, adjustable: false },
+      { id: "ornek", name: "ORNEK", priceValue: 249000, pricePrefix: "", weightKg: 9, fromCaps: false, adjustable: false },
+      { id: "uya", name: "UYA", priceValue: 9900, pricePrefix: "", weightKg: 1, fromCaps: true, adjustable: false },
+    ],
     colors: [
       { id: "cap-red", label: "Cap Red", token: "cap-red" },
       { id: "bottle-green", label: "Bottle Green", token: "bottle-green" },
@@ -499,11 +526,9 @@ export const ru: Content = {
       weight: "вес",
       caps: "число крышек",
     },
-    base: {
-      priceValue: 69900,
-      weightKg: 6,
-      capWeightGrams: 2.5,
-    },
+    capWeightGrams: 2.5,
+    resetLabel: "Сбросить вид",
+    gestureHint: "Вращайте пальцем, двумя двигайте",
     submitLabel: "Отправить заявку",
     telegramBot: "loopform_bot",
   },

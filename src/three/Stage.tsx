@@ -8,11 +8,14 @@ import { Actor } from "@/three/Actor"
 import { actorIds } from "@/three/actors"
 import { cameraDistance, cameraFov } from "@/three/anchors"
 import { CameraRig } from "@/three/CameraRig"
+import { ConfiguratorActor } from "@/three/ConfiguratorActor"
 import { Director } from "@/three/Director"
 import { GroundShadow } from "@/three/GroundShadow"
+import { MeltScene } from "@/three/melt/MeltScene"
 import { detectModels, loadCapModel } from "@/three/models/modelAvailability"
 import { LabelShards } from "@/three/particles/LabelShards"
 import { ParticleField } from "@/three/particles/ParticleField"
+import { attachPointerField } from "@/three/pointerField"
 import { PrintNozzle } from "@/three/PrintNozzle"
 import { ProcessIllustrations } from "@/three/ProcessIllustrations"
 import { renderThumbnails } from "@/three/thumbnailRenderer"
@@ -22,7 +25,7 @@ const FooterPhysics = lazy(() => import("@/three/physics/FooterPhysics"))
 const isDebug = window.location.search.includes("debug")
 const thumbnailDelayMs = 1400
 const secondaryDelayMs = 500
-const secondaryActors = actorIds.filter((id) => id !== "tolqyn")
+const secondaryActors = actorIds.filter((id) => id !== "tolqyn" && id !== "configChair")
 
 function LoadTracker() {
   const { progress, active } = useProgress()
@@ -110,6 +113,8 @@ export default function Stage() {
     return () => window.clearTimeout(timer)
   }, [preloaderDone])
 
+  useEffect(attachPointerField, [])
+
   useEffect(() => {
     Promise.all([detectModels(), loadCapModel()]).finally(() => setModelsChecked(true))
   }, [])
@@ -161,6 +166,7 @@ export default function Stage() {
         <Suspense fallback={null}>
           <Actor id="tolqyn" />
           {secondaryReady ? secondaryActors.map((id) => <Actor key={id} id={id} />) : null}
+          {secondaryReady ? <ConfiguratorActor /> : null}
           <ReadySignal />
         </Suspense>
         <GroundShadow />
@@ -168,6 +174,7 @@ export default function Stage() {
         <ParticleField />
         <LabelShards />
         <ProcessIllustrations />
+        {secondaryReady ? <MeltScene /> : null}
         {physicsMounted.current && !reducedMotion ? (
           <Suspense fallback={null}>
             <FooterPhysics />

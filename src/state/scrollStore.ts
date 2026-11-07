@@ -27,6 +27,18 @@ export const heroRig = {
   entrance: 0,
 }
 
+export const configuratorRig = {
+  print: 1,
+}
+
+export const configuratorView = {
+  yaw: 0,
+  pitch: 0,
+  x: 0,
+  y: 0,
+  zoom: 1,
+}
+
 export const loadState = {
   assets: 0,
 }
@@ -73,12 +85,12 @@ export const useScrollStore = create<ScrollState>((set) => ({
   presentationFrame: 0,
   presentationSection: 0,
   configurator: {
+    model: "tolqyn",
     color: "cap-red",
     height: "dining",
     texture: "smooth",
     cushion: "none",
     angle: 0,
-    dragAngle: 0,
   },
   set: (partial) => set(partial),
   setConfigurator: (partial) => set((state) => ({ configurator: { ...state.configurator, ...partial } })),

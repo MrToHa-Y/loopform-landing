@@ -8,6 +8,7 @@
 
 .stage {
   color: var(--collection-fg);
+  touch-action: pan-y pinch-zoom;
   background-color: var(--collection-bg);
 }
 

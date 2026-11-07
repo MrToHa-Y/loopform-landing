@@ -6,6 +6,7 @@
 
 .stage {
   color: var(--color-graphite);
+  touch-action: pan-y pinch-zoom;
   background-color: var(--color-bone);
 }
 

@@ -90,7 +90,7 @@ export function Manifesto() {
     <StackSection
       id="manifesto"
       theme="light"
-      label={ru.sections[8]?.title ?? ""}
+      label={ru.sections[9]?.title ?? ""}
       heightVh={sectionHeights.manifesto}
       sectionRef={sectionRef}
       className={styles.root}

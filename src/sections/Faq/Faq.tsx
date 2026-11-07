@@ -8,7 +8,7 @@ export function Faq() {
   const { faq } = ru
 
   return (
-    <StackSection id="faq" theme="light" label={ru.sections[11]?.title ?? ""} className={styles.root}>
+    <StackSection id="faq" theme="light" label={ru.sections[12]?.title ?? ""} className={styles.root}>
       <div className={styles.inner}>
         <div className={styles.head}>
           <p className={styles.eyebrow}>{faq.eyebrow}</p>

@@ -74,7 +74,7 @@ export function Business() {
     <StackSection
       id="business"
       theme="accent"
-      label={ru.sections[9]?.title ?? ""}
+      label={ru.sections[10]?.title ?? ""}
       overlap
       sectionRef={sectionRef}
       className={styles.root}

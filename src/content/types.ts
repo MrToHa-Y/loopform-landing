@@ -13,6 +13,7 @@ export type SectionId =
   | "collection"
   | "catalog"
   | "problem"
+  | "melt"
   | "process"
   | "passport"
   | "configurator"
@@ -44,13 +45,15 @@ export type ConfiguratorTextureId = "smooth" | "relief"
 
 export type ConfiguratorCushionId = "none" | "felt"
 
+export type ConfiguratorGroupId = "model" | "color" | "height" | "texture" | "cushion" | "angle"
+
 export interface ConfiguratorState {
+  model: CatalogModelId
   color: ConfiguratorColorId
   height: ConfiguratorHeightId
   texture: ConfiguratorTextureId
   cushion: ConfiguratorCushionId
   angle: number
-  dragAngle: number
 }
 
 export interface SectionEntry {
@@ -152,6 +155,11 @@ export interface Problem {
   lead: string
 }
 
+export interface Melt {
+  lines: string[]
+  labels: string[]
+}
+
 export interface ProcessPhoto {
   src: string
   alt: string
@@ -207,15 +215,21 @@ export interface ConfiguratorHeight extends ConfiguratorOption<ConfiguratorHeigh
   weightKg: number
 }
 
+export interface ConfiguratorModel {
+  id: CatalogModelId
+  name: string
+  priceValue: number
+  pricePrefix: string
+  weightKg: number
+  fromCaps: boolean
+  adjustable: boolean
+}
+
 export interface Configurator {
-  title: string
-  groups: {
-    color: string
-    height: string
-    texture: string
-    cushion: string
-    angle: string
-  }
+  titlePrefix: string
+  groups: Record<ConfiguratorGroupId, string>
+  tabs: Record<ConfiguratorGroupId, string>
+  models: ConfiguratorModel[]
   colors: ConfiguratorColor[]
   heights: ConfiguratorHeight[]
   textures: ConfiguratorOption<ConfiguratorTextureId>[]
@@ -231,11 +245,9 @@ export interface Configurator {
     weight: string
     caps: string
   }
-  base: {
-    priceValue: number
-    weightKg: number
-    capWeightGrams: number
-  }
+  capWeightGrams: number
+  resetLabel: string
+  gestureHint: string
   submitLabel: string
   telegramBot: string
 }
@@ -404,6 +416,7 @@ export interface Content {
   collection: Collection
   catalog: Catalog
   problem: Problem
+  melt: Melt
   process: Process
   passport: Passport
   configurator: Configurator
