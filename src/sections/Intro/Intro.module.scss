@@ -1,0 +1,53 @@
+@use "@/styles/mixins";
+
+.root {
+  @include mixins.page-gutter;
+
+  position: relative;
+  z-index: var(--layer-intro);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100vh;
+  margin-bottom: -100vh;
+  padding-block: var(--space-md);
+  overflow: clip;
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+}
+
+.text {
+  margin-bottom: 8vh;
+  padding-left: calc(4vw - var(--page-gutter));
+  will-change: transform;
+}
+
+.title {
+  @include mixins.giant;
+}
+
+.meta {
+  @include mixins.eyebrow;
+
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  padding-right: var(--badge-clearance);
+}
+
+@include mixins.below("mobile") {
+  .text {
+    margin-bottom: 12vh;
+    padding-left: 0;
+  }
+
+  .meta {
+    padding-right: var(--badge-clearance-small);
+  }
+}
+
+@include mixins.reduced-motion {
+  .root {
+    margin-bottom: 0;
+  }
+}

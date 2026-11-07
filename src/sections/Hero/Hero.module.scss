@@ -1,0 +1,108 @@
+@use "@/styles/mixins";
+
+.root {
+  background-color: var(--color-bone);
+}
+
+.stage {
+  color: var(--color-graphite);
+  background-color: var(--color-bone);
+}
+
+.title {
+  @include mixins.giant;
+
+  position: absolute;
+  bottom: 34vh;
+  left: 4vw;
+}
+
+.footer {
+  position: absolute;
+  top: 70vh;
+  right: 4vw;
+  left: 4vw;
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.subtitle {
+  width: 34vw;
+  min-width: 16rem;
+  font-size: var(--text-lead);
+  line-height: var(--leading-snug);
+}
+
+.slogan {
+  @include mixins.serif("md");
+
+  position: absolute;
+  top: 19vh;
+  left: 47vw;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.layer {
+  @include mixins.eyebrow;
+
+  position: absolute;
+  right: 7.5rem;
+  bottom: var(--space-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.anchor {
+  position: absolute;
+  top: 52vh;
+  left: 70vw;
+  width: 40vw;
+  height: 62vh;
+  transform: translate(-50%, -50%);
+}
+
+@include mixins.below("mobile") {
+  .title {
+    top: calc(var(--header-height) + var(--space-sm));
+    bottom: auto;
+  }
+
+  .footer {
+    top: auto;
+    right: 4rem;
+    bottom: var(--space-xl);
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .subtitle {
+    width: 100%;
+    font-size: var(--text-body);
+  }
+
+  .slogan {
+    position: static;
+    white-space: normal;
+  }
+
+  .layer {
+    right: auto;
+    bottom: var(--space-sm);
+    left: 4vw;
+  }
+
+  .anchor {
+    top: 56vh;
+    left: 54vw;
+    width: 80vw;
+    height: 40vh;
+  }
+}
+
+@include mixins.reduced-motion {
+  .stage {
+    height: 100vh;
+  }
+}

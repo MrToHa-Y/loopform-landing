@@ -1,0 +1,104 @@
+@use "@/styles/mixins";
+
+.root {
+  color: var(--color-bone);
+  background-color: var(--color-cap-red);
+}
+
+.seam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+}
+
+.inner {
+  @include mixins.page-gutter;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  justify-content: flex-end;
+  padding-block: 22vh var(--space-xl);
+}
+
+.title {
+  @include mixins.caps-title;
+
+  max-width: 52vw;
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  align-items: flex-start;
+  padding: var(--space-md);
+  color: var(--color-ink);
+  background-color: var(--color-cap-red);
+  border-top: var(--hairline) solid var(--color-ink);
+}
+
+.stacked {
+  grid-template-columns: 1fr;
+
+  .card {
+    grid-area: 1 / 1;
+    max-width: 33%;
+  }
+
+  .card:nth-child(2) {
+    margin-top: var(--space-md);
+    margin-left: var(--space-md);
+  }
+
+  .card:nth-child(3) {
+    margin-top: calc(var(--space-md) * 2);
+    margin-left: calc(var(--space-md) * 2);
+  }
+
+  .action {
+    visibility: hidden;
+  }
+}
+
+.number {
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-medium);
+}
+
+.cardTitle {
+  @include mixins.serif("md");
+}
+
+.text {
+  flex: 1;
+  font-size: var(--text-body);
+}
+
+.action {
+  @include mixins.button;
+}
+
+@include mixins.below("mobile") {
+  .inner {
+    padding-block: 34vh var(--space-xl);
+  }
+
+  .title {
+    max-width: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

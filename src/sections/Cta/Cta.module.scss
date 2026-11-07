@@ -1,0 +1,105 @@
+@use "@/styles/mixins";
+
+.root {
+  color: var(--color-graphite);
+  background-color: var(--color-cloud);
+}
+
+.inner {
+  @include mixins.page-gutter;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+  min-height: 37vh;
+  padding-block: var(--space-xl);
+}
+
+.title {
+  @include mixins.serif("lg");
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: var(--space-xs);
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: 0;
+}
+
+.label {
+  @include mixins.eyebrow;
+
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+}
+
+.input {
+  width: 100%;
+  height: var(--field-height);
+  padding-inline: var(--space-xs);
+  background-color: var(--color-mist);
+  border: var(--hairline) solid var(--color-graphite);
+  border-radius: var(--radius-md);
+
+  &[aria-invalid="true"] {
+    border-color: var(--color-cap-red);
+    border-width: 2px;
+  }
+}
+
+.error {
+  position: absolute;
+  margin-top: calc(var(--field-height) + var(--space-md) + var(--space-3xs));
+  font-size: var(--text-source);
+  color: var(--color-ink);
+}
+
+.submit {
+  @include mixins.button;
+
+  height: var(--field-height);
+}
+
+.toast {
+  position: fixed;
+  bottom: var(--space-md);
+  left: 50%;
+  z-index: var(--layer-modal);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--text-nav);
+  color: var(--color-bone);
+  pointer-events: none;
+  visibility: hidden;
+  background-color: var(--color-graphite);
+  border-radius: var(--radius-pill);
+  opacity: 0;
+  transform: translate(-50%, 0.75rem);
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    visibility var(--duration-fast);
+}
+
+.toastVisible {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@include mixins.below("tablet") {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+  }
+}

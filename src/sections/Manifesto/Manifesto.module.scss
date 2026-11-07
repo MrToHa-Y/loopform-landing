@@ -1,0 +1,103 @@
+@use "@/styles/mixins";
+
+.root {
+  background-color: var(--color-bone);
+}
+
+.stage {
+  color: var(--color-graphite);
+  background-color: var(--color-bone);
+}
+
+.title {
+  @include mixins.giant;
+
+  position: absolute;
+  top: calc(var(--header-height) + var(--space-lg));
+  left: 2vw;
+  width: 96vw;
+}
+
+.photo {
+  --photo: linear-gradient(115deg, var(--color-graphite) 30%, var(--color-cap-red) 68%, var(--color-sand));
+  --photo-height: 70vh;
+  --photo-size: max(100vw, var(--photo-height));
+  --photo-focus: 0.62;
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-rows: repeat(10, 1fr);
+  height: var(--photo-height);
+  will-change: transform;
+}
+
+.band {
+  display: block;
+  margin-block: -0.5px;
+  background-image: var(--photo);
+  background-repeat: no-repeat;
+  background-position: 50% calc((var(--photo-height) - var(--photo-size)) * var(--photo-focus) - var(--band-index) * var(--photo-height) / 10);
+  background-size: var(--photo-size) var(--photo-size);
+}
+
+.withPhoto .band {
+  background-size: var(--photo-size) auto;
+}
+
+.caption {
+  @include mixins.eyebrow;
+
+  position: absolute;
+  top: var(--space-md);
+  right: var(--page-gutter);
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+  border-radius: var(--radius-sm);
+}
+
+.pilot {
+  @include mixins.serif("md");
+
+  position: absolute;
+  top: var(--space-md);
+  left: var(--page-gutter);
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+  border-radius: var(--radius-sm);
+}
+
+@include mixins.below("mobile") {
+  .photo {
+    --photo-height: 58vh;
+  }
+
+  .caption {
+    top: auto;
+    right: auto;
+    bottom: calc(100% + var(--space-2xs));
+    left: var(--page-gutter);
+  }
+}
+
+@include mixins.reduced-motion {
+  .title {
+    position: relative;
+    top: 0;
+    padding-top: calc(var(--header-height) + var(--space-lg));
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .photo {
+    position: relative;
+  }
+}

@@ -1,0 +1,201 @@
+@use "sass:map";
+
+$breakpoints: (
+  "phone": 390px,
+  "mobile": 768px,
+  "tablet": 1024px,
+  "desktop": 1440px,
+);
+
+$colors: (
+  "bone": #efebe4,
+  "graphite": #141414,
+  "cap-red": #d6452b,
+  "bottle-green": #2f6f4e,
+  "sand": #d9b98c,
+  "cap-blue": #2d5bdb,
+  "sun": #f2c230,
+  "nozzle": #ff7a1a,
+  "paper": #e4dfdb,
+  "mist": #fcfcfc,
+  "cloud": #f2f2f2,
+  "ink": #000000,
+  "lamp": #ffb765,
+);
+
+$on-colors: (
+  "bone": "graphite",
+  "graphite": "bone",
+  "cap-red": "bone",
+  "bottle-green": "bone",
+  "sand": "graphite",
+  "cap-blue": "bone",
+  "sun": "graphite",
+);
+
+$fonts: (
+  "display": ("Unbounded", "Inter", "Arial", sans-serif),
+  "serif": ("Cormorant Garamond", "Georgia", serif),
+  "sans": ("Inter", "Arial", sans-serif),
+  "mono": ("JetBrains Mono", "Inter", "Consolas", monospace),
+);
+
+$font-sizes: (
+  "eyebrow": 0.75rem,
+  "source": 0.6875rem,
+  "body": 0.9375rem,
+  "nav": 0.875rem,
+  "lead": 1.125rem,
+  "caps": clamp(1.5rem, 3.33vw, 4.5rem),
+  "serif-lg": clamp(2rem, 3.6vw, 5rem),
+  "serif-md": clamp(1.625rem, 2.7vw, 3.75rem),
+  "serif-sm": clamp(1.25rem, 1.8vw, 2.5rem),
+  "number": clamp(2.75rem, 7vw, 9rem),
+  "step": clamp(4rem, 10vw, 13rem),
+  "logo": clamp(2rem, 4vw, 4.5rem),
+  "stat": clamp(2rem, 4.9vw, 6.5rem),
+  "figure": clamp(2.25rem, 4.5vw, 6rem),
+  "brand": 1rem,
+  "brand-small": 0.875rem,
+  "badge-ring": 0.5rem,
+  "badge-mark": 0.875rem,
+  "badge-mark-small": 0.625rem,
+);
+
+$font-weights: (
+  "regular": 400,
+  "medium": 500,
+  "semibold": 600,
+  "bold": 700,
+);
+
+$line-heights: (
+  "giant": 0.82,
+  "caps": 0.95,
+  "none": 1,
+  "serif": 1.1,
+  "snug": 1.2,
+  "body": 1.4667,
+);
+
+$tracking: (
+  "display": -0.02em,
+  "tight": -0.01em,
+  "eyebrow": 0.08em,
+);
+
+$spaces: (
+  "3xs": 0.25rem,
+  "2xs": 0.5rem,
+  "xs": 0.75rem,
+  "sm": 1rem,
+  "md": 1.25rem,
+  "lg": 2rem,
+  "xl": 3rem,
+  "2xl": 5rem,
+  "3xl": 8rem,
+);
+
+$radii: (
+  "sm": 0.25rem,
+  "md": 0.5rem,
+  "lg": 0.75rem,
+  "pill": 100em,
+);
+
+$durations: (
+  "fast": 0.4s,
+  "base": 0.8s,
+  "slow": 1.2s,
+);
+
+$easings: (
+  "out": cubic-bezier(0.16, 1, 0.3, 1),
+  "in-out": cubic-bezier(0.65, 0, 0.35, 1),
+);
+
+$layers: (
+  "hero": 1,
+  "intro": 5,
+  "collection": 6,
+  "catalog": 7,
+  "problem": 8,
+  "process": 9,
+  "passport": 10,
+  "configurator": 11,
+  "manifesto": 12,
+  "business": 13,
+  "market": 14,
+  "faq": 15,
+  "cta": 16,
+  "footer": 17,
+  "canvas": 20,
+  "overlay": 30,
+  "header": 40,
+  "rail": 60,
+  "modal": 80,
+  "preloader": 100,
+);
+
+@mixin root-tokens {
+  :root {
+    @each $name, $value in $colors {
+      --color-#{$name}: #{$value};
+    }
+
+    @each $name, $partner in $on-colors {
+      --color-on-#{$name}: #{map.get($colors, $partner)};
+    }
+
+    @each $name, $value in $fonts {
+      --font-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $font-sizes {
+      --text-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $font-weights {
+      --weight-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $line-heights {
+      --leading-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $tracking {
+      --tracking-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $spaces {
+      --space-#{$name}: #{$value};
+    }
+
+    --page-gutter: 1.25rem;
+    --header-height: 3.375rem;
+    --section-padding: 14vh;
+    --hairline: 1px;
+    --badge-clearance: 6.5rem;
+    --badge-clearance-small: 3.75rem;
+    --panel-width: 22.5rem;
+    --button-padding: 0.875rem 1.5rem;
+    --button-padding-small: 0.625rem 0.875rem;
+    --field-height: 2.75rem;
+
+    @each $name, $value in $radii {
+      --radius-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $durations {
+      --duration-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $easings {
+      --ease-#{$name}: #{$value};
+    }
+
+    @each $name, $value in $layers {
+      --layer-#{$name}: #{$value};
+    }
+  }
+}

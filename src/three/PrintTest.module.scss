@@ -1,0 +1,49 @@
+@use "@/styles/mixins";
+
+.root {
+  position: fixed;
+  inset: 0;
+  color: var(--color-graphite);
+  background-color: var(--color-bone);
+}
+
+.controls {
+  position: absolute;
+  right: var(--space-sm);
+  bottom: var(--space-sm);
+  left: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  @include mixins.eyebrow;
+
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+
+  input {
+    flex: 1;
+  }
+}
+
+.models {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.model {
+  @include mixins.eyebrow;
+
+  padding: var(--space-2xs) var(--space-xs);
+  border: var(--hairline) solid currentcolor;
+  border-radius: var(--radius-pill);
+
+  &[aria-pressed="true"] {
+    color: var(--color-bone);
+    background-color: var(--color-graphite);
+  }
+}

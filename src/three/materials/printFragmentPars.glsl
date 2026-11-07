@@ -1,0 +1,16 @@
+uniform float uProgress;
+uniform float uDirection;
+uniform float uMinY;
+uniform float uMaxY;
+uniform float uLayerHeight;
+uniform vec3 uEdgeColor;
+uniform float uEdgeWidth;
+uniform vec3 uBaseColor;
+uniform vec3 uSpeckle[3];
+uniform float uSpeckleAmount;
+uniform float uRelief;
+uniform float uRoughMin;
+uniform float uRoughMax;
+uniform float uTime;
+varying vec3 vObjPos;
+varying vec3 vUpView;

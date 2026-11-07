@@ -1,0 +1,53 @@
+@use "@/styles/mixins";
+
+.section {
+  position: relative;
+  z-index: var(--stack-layer);
+  height: var(--stack-height);
+}
+
+.overlap,
+.overlapDesktop {
+  margin-top: -100vh;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: clip;
+}
+
+@include mixins.below("mobile") {
+  .overlapDesktop {
+    margin-top: 0;
+  }
+
+  .flowOnMobile {
+    height: auto;
+
+    .sticky {
+      position: relative;
+      height: auto;
+      overflow: visible;
+    }
+  }
+}
+
+@include mixins.reduced-motion {
+  .section {
+    height: auto;
+  }
+
+  .overlap,
+  .overlapDesktop {
+    margin-top: 0;
+  }
+
+  .sticky {
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+}

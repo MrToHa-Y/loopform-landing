@@ -1,0 +1,62 @@
+@use "@/styles/mixins";
+
+.rail {
+  position: fixed;
+  top: 50%;
+  right: var(--page-gutter);
+  z-index: var(--layer-rail);
+  padding: var(--space-xs);
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+  border-radius: var(--radius-lg);
+  transform: translateY(-50%);
+}
+
+.item {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  padding-block: var(--space-3xs);
+  opacity: 0.55;
+  transition: opacity var(--duration-fast) var(--ease-out);
+
+  @include mixins.hover {
+    opacity: 1;
+  }
+}
+
+.active {
+  opacity: 1;
+
+  .tick {
+    width: 1.75rem;
+    background-color: var(--color-sun);
+  }
+}
+
+.label {
+  @include mixins.eyebrow;
+}
+
+.tick {
+  width: 0.75rem;
+  height: 2px;
+  background-color: currentcolor;
+  transition: width var(--duration-fast) var(--ease-out);
+}
+
+.counter {
+  @include mixins.eyebrow;
+
+  position: fixed;
+  bottom: var(--page-gutter);
+  left: 50%;
+  z-index: var(--layer-rail);
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+  border-radius: var(--radius-pill);
+  transform: translateX(-50%);
+}

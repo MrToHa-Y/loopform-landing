@@ -1,0 +1,25 @@
+.root {
+  display: block;
+}
+
+.mask,
+.plain {
+  display: block;
+  margin-block: -0.14em;
+  padding-block: 0.14em;
+}
+
+.mask {
+  overflow: clip;
+}
+
+.line {
+  display: block;
+  will-change: transform;
+}
+
+.inner {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+}

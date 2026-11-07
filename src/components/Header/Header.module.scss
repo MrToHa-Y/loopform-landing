@@ -1,0 +1,90 @@
+@use "@/styles/mixins";
+
+.root {
+  @include mixins.page-gutter;
+
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: var(--layer-header);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-sm);
+  align-items: center;
+  height: var(--header-height);
+  font-size: var(--text-nav);
+  color: var(--color-bone);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+
+  &[data-header-theme="light"] {
+    color: var(--color-graphite);
+  }
+
+  &[data-header-theme="ink"] {
+    color: var(--color-ink);
+  }
+}
+
+.hidden {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.side {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.sideEnd {
+  justify-content: flex-end;
+}
+
+.link {
+  position: relative;
+  white-space: nowrap;
+
+  &::after {
+    position: absolute;
+    right: 0;
+    bottom: -0.125rem;
+    left: 0;
+    height: 1px;
+    content: "";
+    background-color: currentcolor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  @include mixins.hover {
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: var(--text-brand);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-display);
+}
+
+@include mixins.below("mobile") {
+  .desktopOnly {
+    display: none;
+  }
+
+  .logo {
+    font-size: var(--text-brand-small);
+  }
+
+  .side {
+    gap: var(--space-xs);
+  }
+}

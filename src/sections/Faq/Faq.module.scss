@@ -1,0 +1,36 @@
+@use "@/styles/mixins";
+
+.root {
+  color: var(--color-graphite);
+  background-color: var(--color-mist);
+}
+
+.inner {
+  @include mixins.page-gutter;
+
+  display: grid;
+  grid-template-columns: 40% 60%;
+  min-height: 100vh;
+  padding-block: var(--section-padding);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.eyebrow {
+  @include mixins.eyebrow;
+}
+
+.title {
+  @include mixins.caps-title;
+}
+
+@include mixins.below("mobile") {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}

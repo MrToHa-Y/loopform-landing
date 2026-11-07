@@ -1,0 +1,114 @@
+@use "@/styles/mixins";
+
+.root {
+  background-color: var(--color-graphite);
+}
+
+.stage {
+  @include mixins.page-gutter;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4vh;
+  padding-top: calc(var(--header-height) + 5vh);
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+}
+
+.title {
+  @include mixins.caps-title;
+
+  max-width: 68vw;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  align-items: flex-start;
+}
+
+.value {
+  @include mixins.number;
+
+  font-size: var(--text-stat);
+  white-space: nowrap;
+}
+
+.label {
+  font-size: var(--text-nav);
+}
+
+.source {
+  font-family: var(--font-mono);
+  font-size: var(--text-source);
+  opacity: 0.7;
+}
+
+a.source {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.lead {
+  @include mixins.serif("md");
+
+  position: absolute;
+  bottom: 12vh;
+  left: var(--page-gutter);
+  width: 42vw;
+}
+
+.anchor {
+  position: absolute;
+  bottom: 6vh;
+  left: 62vw;
+  width: 32vw;
+  height: 46vh;
+}
+
+@include mixins.below("mobile") {
+  .title {
+    max-width: none;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lead {
+    right: var(--page-gutter);
+    bottom: 5vh;
+    width: auto;
+    font-size: var(--text-serif-sm);
+  }
+
+  .anchor {
+    bottom: 20vh;
+    left: 20vw;
+    width: 60vw;
+    height: 28vh;
+  }
+}
+
+@include mixins.reduced-motion {
+  .stage {
+    padding-bottom: var(--space-xl);
+  }
+
+  .lead {
+    position: static;
+    width: auto;
+    max-width: 42rem;
+  }
+
+  .anchor {
+    display: none;
+  }
+}

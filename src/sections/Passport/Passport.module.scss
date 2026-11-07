@@ -1,0 +1,177 @@
+@use "@/styles/mixins";
+
+.root {
+  background-color: var(--color-graphite);
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  color: var(--color-bone);
+  background-color: var(--color-graphite);
+}
+
+.visual {
+  position: relative;
+}
+
+.chairAnchor {
+  position: absolute;
+  top: 8vh;
+  left: 14vw;
+  width: 24vw;
+  height: 40vh;
+}
+
+.stoolAnchor {
+  position: absolute;
+  bottom: 5vh;
+  left: 14vw;
+  width: 22vw;
+  height: 34vh;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: flex-start;
+  justify-content: center;
+  padding-right: var(--page-gutter);
+  padding-block: calc(var(--header-height) + var(--space-2xs)) var(--space-md);
+}
+
+.title {
+  @include mixins.caps-title;
+}
+
+.titleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.list {
+  width: 100%;
+}
+
+.item {
+  padding-block: var(--space-xs);
+  border-top: var(--hairline) solid rgb(from var(--color-bone) r g b / 20%);
+}
+
+.itemTitle {
+  @include mixins.serif("md");
+
+  opacity: 0.45;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.itemText {
+  font-size: var(--text-body);
+  opacity: 0.56;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.itemActive {
+  .itemTitle,
+  .itemText {
+    opacity: 1;
+  }
+}
+
+.action {
+  @include mixins.button;
+}
+
+.dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  margin: auto;
+  overflow: auto;
+  color: var(--color-graphite);
+  background-color: var(--color-bone);
+  border: 0;
+  border-radius: var(--radius-lg);
+
+  &::backdrop {
+    background-color: rgb(from var(--color-graphite) r g b / 70%);
+  }
+}
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  padding: var(--space-lg);
+}
+
+.dialogNote {
+  @include mixins.eyebrow;
+
+  line-height: var(--leading-snug);
+}
+
+.dialogTitle {
+  @include mixins.caps-title;
+
+  font-size: var(--text-serif-md);
+}
+
+.dialogModel {
+  @include mixins.serif("sm");
+}
+
+.fields {
+  width: 100%;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: var(--space-sm);
+  padding-block: var(--space-2xs);
+  font-size: var(--text-body);
+  border-top: var(--hairline) solid rgb(from var(--color-graphite) r g b / 20%);
+
+  dt {
+    font-weight: var(--weight-medium);
+  }
+}
+
+@include mixins.below("mobile") {
+  .stage {
+    grid-template-columns: 1fr;
+    padding-block: var(--space-xl);
+  }
+
+  .visual {
+    height: 70vh;
+  }
+
+  .chairAnchor {
+    top: 2vh;
+    left: 20vw;
+    width: 60vw;
+    height: 30vh;
+  }
+
+  .stoolAnchor {
+    bottom: 2vh;
+    left: 25vw;
+    width: 50vw;
+    height: 26vh;
+  }
+
+  .copy {
+    padding-inline: var(--page-gutter);
+    padding-block: 0;
+  }
+}
+
+@include mixins.reduced-motion {
+  .itemTitle,
+  .itemText {
+    opacity: 1;
+  }
+}

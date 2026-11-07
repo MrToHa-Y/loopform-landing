@@ -1,0 +1,81 @@
+@use "@/styles/mixins";
+
+.root {
+  position: relative;
+  z-index: var(--layer-footer);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+  min-height: 100vh;
+  padding-top: calc(var(--header-height) + var(--space-lg));
+  overflow: clip;
+  color: var(--color-graphite);
+  background-color: var(--color-paper);
+}
+
+.columns {
+  @include mixins.page-gutter;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 14rem));
+  gap: var(--space-lg);
+}
+
+.columnTitle {
+  @include mixins.eyebrow;
+
+  margin-bottom: var(--space-xs);
+}
+
+.column li {
+  padding-block: var(--space-3xs);
+  font-size: var(--text-body);
+}
+
+.link {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--duration-fast) var(--ease-out);
+
+  @include mixins.hover {
+    text-decoration-color: currentcolor;
+  }
+}
+
+.logoWrap {
+  margin-top: auto;
+  margin-inline: 1vw;
+}
+
+.logo {
+  @include mixins.giant;
+}
+
+.bottom {
+  @include mixins.page-gutter;
+
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  padding-right: var(--badge-clearance);
+  padding-bottom: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-source);
+}
+
+@include mixins.below("mobile") {
+  .root {
+    gap: var(--space-xl);
+    min-height: 90vh;
+  }
+
+  .columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bottom {
+    flex-direction: column;
+    padding-right: var(--page-gutter);
+  }
+}
