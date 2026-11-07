@@ -43,20 +43,21 @@ export function FitText({
     }
 
     const lineElements = Array.from(root.querySelectorAll<HTMLElement>("[data-fit-line]"))
+    const maskElements = Array.from(root.querySelectorAll<HTMLElement>("[data-fit-mask]"))
     const viewportWidth = document.documentElement.clientWidth
     const targetWidth = (widthVw / 100) * viewportWidth
 
     root.style.fontSize = `${probeSize}px`
-    lineElements.forEach((element) => {
+    maskElements.forEach((element) => {
       element.style.fontSize = ""
     })
 
     const widths = lineElements.map((element) => element.getBoundingClientRect().width)
 
     if (capsKey) {
-      lineElements.forEach((element, index) => {
+      maskElements.forEach((element, index) => {
         const fitted = (probeSize * targetWidth) / (widths[index] || 1)
-        const cap = ((Number(capsKey?.split("|")[index]) || widthVw) / 100) * viewportWidth
+        const cap = ((Number(capsKey.split("|")[index]) || widthVw) / 100) * viewportWidth
         element.style.fontSize = `${Math.min(fitted, cap)}px`
       })
       return

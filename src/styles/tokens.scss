@@ -181,6 +181,7 @@ $layers: (
     --button-padding: 0.875rem 1.5rem;
     --button-padding-small: 0.625rem 0.875rem;
     --field-height: 2.75rem;
+    --mobile-dock: 5.5rem;
 
     @each $name, $value in $radii {
       --radius-#{$name}: #{$value};

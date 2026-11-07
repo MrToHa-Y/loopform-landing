@@ -123,3 +123,40 @@
   flex: 1;
   min-height: 48vh;
 }
+
+@include mixins.below("mobile") {
+  .translation {
+    top: calc(var(--header-height) + var(--space-2xs));
+    left: var(--page-gutter);
+  }
+
+  .nameBlock {
+    bottom: calc(var(--mobile-dock) + 7.25rem);
+    left: var(--page-gutter);
+  }
+
+  .description {
+    top: auto;
+    right: var(--page-gutter);
+    bottom: calc(var(--mobile-dock) + var(--space-xl) + var(--space-xs));
+    left: var(--page-gutter);
+    line-height: var(--leading-snug);
+  }
+
+  .anchor {
+    top: 35vh;
+    left: 50vw;
+    width: 88vw;
+    height: 44vh;
+  }
+
+  .thumbs {
+    bottom: var(--mobile-dock);
+  }
+
+  .step {
+    top: calc(var(--header-height) + var(--space-xs));
+    right: var(--page-gutter);
+    bottom: auto;
+  }
+}

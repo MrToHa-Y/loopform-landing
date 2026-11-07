@@ -341,10 +341,11 @@ function updateBusiness(size: StageSize) {
     return
   }
 
-  const stoolHeight = worldHeight * 0.32
+  const worldWidth = worldHeight * (size.width / size.height)
+  const stoolHeight = Math.min(worldHeight * 0.32, worldWidth * 0.5)
   const rect: WorldRect = {
     ...seam,
-    x: worldHeight * (size.width / size.height) * 0.2,
+    x: worldWidth * 0.2,
     y: seam.y + stoolHeight * 0.32,
     width: stoolHeight * 1.4,
     height: stoolHeight,
@@ -362,138 +363,63 @@ function inView(rect: WorldRect | null, height: number) {
   return rect !== null && rect.bottom > -height * 0.25 && rect.top < height * 1.25
 }
 
-function updateCompact(size: StageSize, reduced: boolean) {
-  const { width, height, time } = size
-  const hero = readAnchor("hero-product", width, height)
-  const firstBlock = readAnchor("collection-product-0", width, height)
-  const seam = reduced ? 0 : smooth(readProgress("heroSeam"))
-  const entrance = reduced ? 1 : heroRig.entrance
-  const heroPrint = reduced ? 1 : readProgress("heroHold") < 1 ? 1 : readProgress("heroPrint")
-  const rig = collectionRig.models
-  const staticSpin = reduced ? 0 : Math.sin(time * 0.4) * 0.14
-  let cloudCenterSet = false
+function placeStatic(id: ActorId, anchor: string, size: StageSize, rotationY: number, rotationZ = 0, fill = 1) {
+  const rect = readAnchor(anchor, size.width, size.height)
 
-  if (hero && firstBlock && (inView(hero, height) || inView(firstBlock, height))) {
-    const rect = mixRects(hero, firstBlock, seam)
-    const chair = place("tolqyn", rect, 0.76)
+  if (!inView(rect, size.height) || !rect) {
+    return false
+  }
 
-    chair.visible = entrance > 0.001
-    chair.y += (1 - entrance) * worldHeight * 0.9
-    chair.rotationY = -25 * degrees + staticSpin
-    chair.rotationZ = 0
-    chair.print = Math.min(heroPrint, seam > 0.98 ? (rig[0]?.print ?? 1) : 1)
-    chair.stiffness = 18
-    setNozzle("tolqyn")
+  const target = place(id, rect, fill)
+
+  target.rotationY = rotationY * degrees
+  target.rotationZ = rotationZ * degrees
+  target.print = 1
+
+  return true
+}
+
+function updateStatic(size: StageSize) {
+  const heroVisible = placeStatic("tolqyn", "hero-product", size, -25, 0, 0.9)
+
+  if (heroVisible) {
+    const chair = actorTargets.tolqyn
+
     particleDirective.center.set(chair.x, chair.y, 0)
-    cloudCenterSet = inView(hero, height) && seam < 0.5
-    shardDirective.opacity = reduced ? 0 : entrance * (1 - seam)
-    shardDirective.center.set(chair.x, chair.y, 0)
+    setParticles("cloud", "cloud", 1)
+  } else {
+    setParticles("hidden", "hidden", 0)
+    placeStatic("tolqyn", "collection-product-0", size, -25, 0, 0.8)
+    placeStatic("tolqyn", "passport-chair", size, -20, 120)
   }
 
   collectionActors.forEach((id, index) => {
-    const state = rig[index]
-    const rect = index === 0 ? null : readAnchor(`collection-product-${index}`, width, height)
-
-    if (index === 0 || !state || !rect || !inView(rect, height)) {
-      return
+    if (index > 0) {
+      placeStatic(id, `collection-product-${index}`, size, 15, 0, (collectionFill[index] ?? 1) * 0.86)
     }
-
-    const target = place(id, rect, (collectionFill[index] ?? 1) * 0.86)
-
-    target.rotationY = 15 * degrees + staticSpin
-    target.rotationZ = 0
-    target.print = state.print
-    target.stiffness = 18
-    setNozzle(id)
   })
 
-  const chairAnchor = readAnchor("passport-chair", width, height)
-  const stoolAnchor = readAnchor("passport-stool", width, height)
+  placeStatic("stool", "passport-stool", size, 10)
+  placeStatic("configChair", "configurator-product", size, -25, 0, 0.88)
+  placeStatic("processPrint", "process-4", size, -28, 0, 0.9)
+  placeStatic("processFinal", "process-5", size, -28, 0, 0.9)
 
-  if (chairAnchor && inView(chairAnchor, height)) {
-    const chair = place("tolqyn", chairAnchor)
+  const config = useScrollStore.getState().configurator
 
-    chair.rotationY = -20 * degrees
-    chair.rotationZ = 120 * degrees
-    chair.print = 1
-    chair.stiffness = 24
-  }
-
-  if (stoolAnchor && inView(stoolAnchor, height)) {
-    const stool = place("stool", stoolAnchor)
-    const position = clamp01(1 - stoolAnchor.top / height)
-
-    stool.rotationY = 10 * degrees
-    stool.rotationZ = 0
-    stool.print = reduced ? 1 : smooth(position * 1.3)
-    stool.stiffness = 24
-    setNozzle("stool")
-  }
-
-  const config = readAnchor("configurator-product", width, height)
-
-  if (config && inView(config, height)) {
-    const state = useScrollStore.getState().configurator
-    const chair = place("configChair", config, 0.88)
-
-    chair.rotationY = (-25 + state.angle + state.dragAngle) * degrees
-    chair.rotationZ = 0
-    chair.print = 1
-    chair.stiffness = 24
-  }
-
-  const processPrint = readAnchor("process-4", width, height)
-  const processFinal = readAnchor("process-5", width, height)
-
-  if (processPrint && inView(processPrint, height)) {
-    const target = place("processPrint", processPrint, 0.9)
-
-    target.rotationY = -28 * degrees
-    target.rotationZ = 0
-    target.print = reduced ? 1 : smooth(clamp01(1.1 - processPrint.top / height))
-    target.stiffness = 24
-    setNozzle("processPrint")
-  }
-
-  if (processFinal && inView(processFinal, height)) {
-    const target = place("processFinal", processFinal, 0.9)
-
-    target.rotationY = -28 * degrees
-    target.rotationZ = 0
-    target.print = 1
-    target.stiffness = 24
-  }
-
-  processDirective.visible = inView(readAnchor("process-1", width, height), height) || inView(readAnchor("process-3", width, height), height)
-
-  const businessSeam = readAnchor("business-seam", width, height)
-
-  if (!reduced && businessSeam && businessSeam.top < height * 1.2 && businessSeam.top > -height * 0.25) {
-    updateBusiness(size)
-  }
-
-  if (reduced) {
-    setParticles(cloudCenterSet ? "cloud" : "hidden", cloudCenterSet ? "cloud" : "hidden", 1)
-    return
-  }
-
-  if (cloudCenterSet) {
-    setParticles("cloud", "intake", range(readProgress("heroPrint"), 0, 0.9))
-  } else if (!updateProblem(size)) {
-    setParticles("hidden", "hidden", 0)
-  }
+  actorTargets.configChair.rotationY = (-25 + config.angle + config.dragAngle) * degrees
+  processDirective.visible = inView(readAnchor("process-1", size.width, size.height), size.height)
 }
 
 export function runChoreography(size: StageSize) {
-  const { compact, reducedMotion } = useScrollStore.getState()
+  const { reducedMotion } = useScrollStore.getState()
 
   resetActors()
   particleDirective.paletteMode = false
   shardDirective.opacity = 0
 
-  if (compact || reducedMotion) {
-    particleDirective.spin = reducedMotion ? 0 : 1
-    updateCompact(size, reducedMotion)
+  if (reducedMotion) {
+    particleDirective.spin = 0
+    updateStatic(size)
     return
   }
 

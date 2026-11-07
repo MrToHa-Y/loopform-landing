@@ -141,37 +141,63 @@
 
 @include mixins.below("mobile") {
   .stage {
+    grid-template-rows: 46vh 1fr;
     grid-template-columns: 1fr;
-    padding-block: var(--space-xl);
-  }
-
-  .visual {
-    height: 70vh;
   }
 
   .chairAnchor {
-    top: 2vh;
-    left: 20vw;
-    width: 60vw;
-    height: 30vh;
+    top: 6vh;
+    left: 24vw;
+    width: 52vw;
+    height: 21vh;
   }
 
   .stoolAnchor {
-    bottom: 2vh;
-    left: 25vw;
-    width: 50vw;
-    height: 26vh;
+    bottom: 0;
+    left: 30vw;
+    width: 40vw;
+    height: 14vh;
   }
 
   .copy {
-    padding-inline: var(--page-gutter);
-    padding-block: 0;
+    gap: var(--space-xs);
+    justify-content: flex-start;
+    padding: var(--space-2xs) var(--page-gutter) var(--space-sm);
+  }
+
+  .title {
+    font-size: var(--text-serif-sm);
+  }
+
+  .item {
+    padding-block: var(--space-2xs);
+  }
+
+  .itemTitle {
+    font-size: var(--text-serif-sm);
+  }
+
+  .itemText {
+    max-height: 0;
+    overflow: clip;
+    transition:
+      max-height var(--duration-fast) var(--ease-out),
+      opacity var(--duration-fast) var(--ease-out);
+  }
+
+  .itemActive .itemText {
+    max-height: 5em;
   }
 }
 
 @include mixins.reduced-motion {
+  .stage {
+    grid-template-rows: auto;
+  }
+
   .itemTitle,
   .itemText {
+    max-height: none;
     opacity: 1;
   }
 }

@@ -87,7 +87,7 @@ export function Configurator() {
       id="configurator"
       theme="light"
       label={ru.sections[7]?.title ?? ""}
-      overlap="desktop"
+      overlap
       sectionRef={sectionRef}
       className={styles.root}
     >

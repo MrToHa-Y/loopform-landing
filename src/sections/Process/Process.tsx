@@ -29,12 +29,11 @@ export function Process() {
   const pathRef = useRef<SVGPathElement>(null)
   const runnerRef = useRef<HTMLSpanElement>(null)
   const layoutReady = useScrollStore((state) => state.layoutReady)
-  const compact = useScrollStore((state) => state.compact)
   const reducedMotion = useScrollStore((state) => state.reducedMotion)
   const viewportVersion = useScrollStore((state) => state.viewportVersion)
   const zigzag = useMemo(buildZigzag, [])
   const { process } = ru
-  const stacked = compact || reducedMotion
+  const stacked = reducedMotion
 
   useSectionProgress(sectionRef, "process")
 
@@ -84,8 +83,7 @@ export function Process() {
       theme="light"
       label={ru.sections[5]?.title ?? ""}
       heightVh={sectionHeights.process}
-      overlap="always"
-      flowOnMobile
+      overlap
       sectionRef={sectionRef}
       className={styles.root}
       stickyClassName={styles.stage}

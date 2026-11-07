@@ -77,9 +77,8 @@
   }
 
   .caption {
-    top: auto;
+    top: calc(var(--space-md) + var(--space-xl) + var(--space-2xs));
     right: auto;
-    bottom: calc(100% + var(--space-2xs));
     left: var(--page-gutter);
   }
 }

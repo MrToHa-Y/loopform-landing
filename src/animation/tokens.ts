@@ -140,9 +140,9 @@ export const footerPhysics = {
 
 export const particleCounts = {
   capsDesktop: 240,
-  capsMobile: 70,
+  capsMobile: 120,
   flakesDesktop: 360,
-  flakesMobile: 100,
+  flakesMobile: 180,
 } as const
 
 export const scatter = {

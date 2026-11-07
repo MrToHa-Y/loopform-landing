@@ -70,6 +70,7 @@ export function Manifesto() {
         },
       })
 
+      reveal.fromTo("[data-photo-label]", { autoAlpha: 0 }, { autoAlpha: 1, ease: eases.linear, duration: 0.15 }, 0.1)
       reveal.fromTo("[data-photo]", { yPercent: 40 }, { yPercent: 0, ease: eases.linear, duration: 1 }, 0)
       reveal.fromTo(
         "[data-band]",
@@ -111,8 +112,12 @@ export function Manifesto() {
             style={{ "--band-index": index } as CSSProperties}
           />
         ))}
-        <figcaption className={styles.caption}>{manifesto.imageCaption}</figcaption>
-        <p className={styles.pilot}>{manifesto.pilotCall}</p>
+        <figcaption data-photo-label className={styles.caption}>
+          {manifesto.imageCaption}
+        </figcaption>
+        <p data-photo-label className={styles.pilot}>
+          {manifesto.pilotCall}
+        </p>
       </figure>
     </StackSection>
   )

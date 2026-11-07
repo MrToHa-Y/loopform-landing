@@ -95,7 +95,8 @@ try {
   mkdirSync("shots", { recursive: true })
 
   const browser = await chromium.launch({
-    args: ["--use-angle=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist", "--enable-unsafe-swiftshader"],
+    channel: "chrome",
+    args: ["--use-angle=d3d11", "--ignore-gpu-blocklist"],
   })
 
   if (!onlyMobile) {

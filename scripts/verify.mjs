@@ -225,6 +225,39 @@ try {
     await context.close()
   }
 
+  {
+    const { context, page, errors } = await open(browser, { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+    const sticky = await page.evaluate(() =>
+      ["collection", "problem", "process", "passport", "manifesto"].every(
+        (id) => getComputedStyle(document.querySelector(`[data-section='${id}'] [data-sticky]`)).position === "sticky",
+      ),
+    )
+    report("phone keeps every sticky scene", sticky)
+
+    await jump(page, 305)
+    await page.waitForFunction(
+      () => getComputedStyle(document.querySelector("[data-section='collection']")).getPropertyValue("--collection-bg") === "rgb(47, 111, 78)",
+      undefined,
+      { timeout: 8000 },
+    ).catch(() => undefined)
+    const phoneBackground = await page.evaluate(() => getComputedStyle(document.querySelector("[data-section='collection']")).getPropertyValue("--collection-bg"))
+    report("phone collection switches models", phoneBackground === "rgb(47, 111, 78)", phoneBackground)
+
+    await jump(page, 1180)
+    await page.waitForTimeout(1200)
+    const shift = await page.evaluate(() => new DOMMatrix(getComputedStyle(document.querySelector("[data-section='process'] ol")).transform).m41)
+    report("phone process moves horizontally", shift < -100, String(Math.round(shift)))
+
+    const catalog = await page.evaluate(() => {
+      const cards = [...document.querySelectorAll("[data-card]")].slice(0, 2).map((card) => card.getBoundingClientRect())
+      const caption = document.querySelector("[data-card] h3").getBoundingClientRect()
+      return { gap: cards[1].left - cards[0].right, inside: caption.right <= cards[0].right }
+    })
+    report("phone catalog captions stay inside their card", catalog.gap >= 12 && catalog.inside, JSON.stringify(catalog))
+    report("no console errors on phone", errors.length === 0, errors.slice(0, 3).join(" | "))
+    await context.close()
+  }
+
   for (const width of [390, 768, 1024, 1440, 1920]) {
     const height = width < 768 ? 844 : 900
     const { context, page, errors } = await open(browser, { viewport: { width, height } })

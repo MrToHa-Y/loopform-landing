@@ -7,8 +7,7 @@ interface StackSectionProps {
   theme: ThemeName
   label: string
   heightVh?: number
-  overlap?: "always" | "desktop" | "none"
-  flowOnMobile?: boolean
+  overlap?: boolean
   themeOffsetVh?: number
   className?: string
   stickyClassName?: string
@@ -21,8 +20,7 @@ export function StackSection({
   theme,
   label,
   heightVh,
-  overlap = "none",
-  flowOnMobile = false,
+  overlap = false,
   themeOffsetVh,
   className,
   stickyClassName,
@@ -36,9 +34,7 @@ export function StackSection({
 
   const sectionClasses = [
     styles.section,
-    overlap === "always" ? styles.overlap : "",
-    overlap === "desktop" ? styles.overlapDesktop : "",
-    flowOnMobile ? styles.flowOnMobile : "",
+    overlap ? styles.overlap : "",
     className ?? "",
   ]
 

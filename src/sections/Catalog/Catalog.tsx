@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react"
-import type { PointerEvent } from "react"
+import type { CSSProperties, MouseEvent, PointerEvent } from "react"
 import { Flip, gsap, useGSAP } from "@/animation/gsap"
 import { durations, eases, sectionHeights, staggers } from "@/animation/tokens"
 import { MagneticButton } from "@/components/MagneticButton/MagneticButton"
@@ -11,7 +11,8 @@ import { thumbnails, useScrollStore } from "@/state/scrollStore"
 import styles from "./Catalog.module.scss"
 
 const products = ru.catalog.items.filter((item) => item.kind === "product")
-const cardsPerPage = 3
+const desktopCardsPerPage = 3
+const dragThreshold = 6
 
 export function Catalog() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -22,7 +23,9 @@ export function Catalog() {
   const layoutReady = useScrollStore((state) => state.layoutReady)
   const reducedMotion = useScrollStore((state) => state.reducedMotion)
   useScrollStore((state) => state.thumbnailsVersion)
+  const compact = useScrollStore((state) => state.compact)
   const { catalog } = ru
+  const cardsPerPage = compact ? 1 : desktopCardsPerPage
   const pages = Math.ceil(products.length / cardsPerPage)
 
   const maxOffset = useCallback(() => {
@@ -36,7 +39,7 @@ export function Catalog() {
       const card = trackRef.current?.children[index * cardsPerPage] as HTMLElement | undefined
       return card ? Math.min(card.offsetLeft, maxOffset()) : 0
     },
-    [maxOffset],
+    [cardsPerPage, maxOffset],
   )
 
   const moveTo = useCallback(
@@ -75,7 +78,6 @@ export function Catalog() {
       startOffset: offsetForPage(page),
       moved: false,
     }
-    event.currentTarget.setPointerCapture(event.pointerId)
   }
 
   const handleMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -89,7 +91,15 @@ export function Catalog() {
     const delta = event.clientX - drag.startX
     const offset = Math.max(0, Math.min(maxOffset(), drag.startOffset - delta))
 
-    drag.moved = drag.moved || Math.abs(delta) > 6
+    if (!drag.moved && Math.abs(delta) > dragThreshold) {
+      drag.moved = true
+      event.currentTarget.setPointerCapture(event.pointerId)
+    }
+
+    if (!drag.moved) {
+      return
+    }
+
     track.style.transform = `translateX(${-offset}px)`
   }
 
@@ -102,11 +112,23 @@ export function Catalog() {
 
     drag.active = false
 
+    if (!drag.moved) {
+      return
+    }
+
     const delta = event.clientX - drag.startX
     const threshold = 60
     const direction = Math.abs(delta) < threshold ? 0 : delta < 0 ? 1 : -1
 
     moveTo(page + direction)
+  }
+
+  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (dragState.current.moved) {
+      event.preventDefault()
+      event.stopPropagation()
+      dragState.current.moved = false
+    }
   }
 
   useGSAP(
@@ -132,11 +154,11 @@ export function Catalog() {
       id="catalog"
       theme="light"
       label={ru.sections[3]?.title ?? ""}
-      overlap="desktop"
+      overlap
       sectionRef={sectionRef}
       className={styles.root}
     >
-      <div className={styles.inner} style={{ minHeight: `${sectionHeights.catalog}vh` }}>
+      <div className={styles.inner} style={{ "--catalog-height": `${sectionHeights.catalog}vh` } as CSSProperties}>
         <div className={styles.head}>
           <p className={styles.eyebrow}>{catalog.eyebrow}</p>
           <SplitLines as="h2" className={styles.title}>
@@ -155,6 +177,7 @@ export function Catalog() {
           onPointerMove={handleMove}
           onPointerUp={handleUp}
           onPointerCancel={handleUp}
+          onClickCapture={handleClick}
         >
           <ul ref={trackRef} className={styles.track}>
             {products.map((item) => {
@@ -168,20 +191,14 @@ export function Catalog() {
                       <img src={thumbnail} alt={`${item.model}, ${item.type}`} loading="lazy" draggable={false} />
                     ) : null}
                     {photo ? <span className={styles.aiNote}>{ru.brand.aiImageNote}</span> : null}
-                    <a
-                      href={catalog.buyUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={styles.buy}
-                      draggable={false}
-                    >
-                      {catalog.buyLabel}
-                    </a>
                   </div>
                   <div className={styles.caption}>
                     <h3 className={styles.cardName}>{item.model}</h3>
                     <p className={styles.cardPrice}>{item.priceLabel}</p>
                   </div>
+                  <a href={catalog.buyUrl} target="_blank" rel="noreferrer" className={styles.buy} draggable={false}>
+                    {catalog.buyLabel}
+                  </a>
                 </li>
               )
             })}

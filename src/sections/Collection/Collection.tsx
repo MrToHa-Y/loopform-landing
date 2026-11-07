@@ -30,7 +30,7 @@ export function Collection() {
   const compact = useScrollStore((state) => state.compact)
   const reducedMotion = useScrollStore((state) => state.reducedMotion)
   const activeModel = useScrollStore((state) => state.activeModel)
-  const stacked = compact || reducedMotion
+  const stacked = reducedMotion
   useScrollStore((state) => state.thumbnailsVersion)
   const { collection } = ru
   const displayed = useRef(0)
@@ -223,7 +223,7 @@ export function Collection() {
         id="collection"
         theme="accent"
         label={ru.sections[2]?.title ?? ""}
-        overlap="always"
+        overlap
         sectionRef={sectionRef}
         className={styles.stackedRoot}
       >
@@ -254,7 +254,7 @@ export function Collection() {
       theme="accent"
       label={ru.sections[2]?.title ?? ""}
       heightVh={sectionHeights.collection}
-      overlap="always"
+      overlap
       sectionRef={sectionRef}
       className={styles.root}
       stickyClassName={styles.stage}
@@ -268,8 +268,8 @@ export function Collection() {
             <FitText
               as="h2"
               lines={[model.name, model.type]}
-              widthVw={58}
-              lineCapsVw={[19, 6]}
+              widthVw={compact ? 92 : 58}
+              lineCapsVw={compact ? [26, 8] : [19, 6]}
               className={styles.name}
             />
           </div>

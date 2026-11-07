@@ -15,10 +15,9 @@ export function Passport() {
   const [activeItem, setActiveItem] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
   const layoutReady = useScrollStore((state) => state.layoutReady)
-  const compact = useScrollStore((state) => state.compact)
   const reducedMotion = useScrollStore((state) => state.reducedMotion)
   const { passport } = ru
-  const allActive = compact || reducedMotion
+  const allActive = reducedMotion
 
   useSectionProgress(sectionRef, "passport")
 
@@ -69,8 +68,7 @@ export function Passport() {
       theme="dark"
       label={ru.sections[6]?.title ?? ""}
       heightVh={sectionHeights.passport}
-      overlap="desktop"
-      flowOnMobile
+      overlap
       sectionRef={sectionRef}
       className={styles.root}
       stickyClassName={styles.stage}

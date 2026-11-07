@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
+  min-height: var(--catalog-height);
   padding-block: var(--section-padding) var(--space-xl);
 }
 
@@ -52,13 +53,25 @@
 
 .track {
   display: flex;
-  gap: 0.6vw;
+  gap: var(--space-sm);
   will-change: transform;
 }
 
 .card {
+  position: relative;
   flex: none;
   width: 31vw;
+
+  @include mixins.hover {
+    img {
+      transform: scale(1.04);
+    }
+
+    .buy {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
 }
 
 .photo {
@@ -74,24 +87,13 @@
     pointer-events: none;
     transition: transform var(--duration-base) var(--ease-out);
   }
-
-  @include mixins.hover {
-    img {
-      transform: scale(1.04);
-    }
-
-    .buy {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-  }
 }
 
 .buy {
   @include mixins.button;
 
   position: absolute;
-  bottom: var(--space-sm);
+  bottom: var(--space-2xl);
   left: 50%;
   opacity: 0;
   transform: translate(-50%, 0.5rem);
@@ -120,19 +122,16 @@
 
 .caption {
   display: flex;
-  gap: var(--space-sm);
-  justify-content: space-between;
-  padding-top: var(--space-2xs);
+  flex-direction: column;
+  gap: var(--space-3xs);
+  padding-top: var(--space-xs);
   font-size: var(--text-body);
+  line-height: var(--leading-snug);
 }
 
 .cardName {
   font: inherit;
   font-weight: var(--weight-medium);
-}
-
-.cardPrice {
-  text-align: right;
 }
 
 .controls {
@@ -172,21 +171,28 @@
 }
 
 @include mixins.below("mobile") {
+  .inner {
+    gap: var(--space-lg);
+    min-height: auto;
+  }
+
   .eyebrow,
   .title {
     grid-column: 1 / -1;
   }
 
   .card {
-    width: 76vw;
+    width: 78vw;
   }
 
   .photo {
-    height: 88vw;
+    height: 90vw;
   }
 
   .buy {
+    position: static;
+    margin-top: var(--space-xs);
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: none;
   }
 }

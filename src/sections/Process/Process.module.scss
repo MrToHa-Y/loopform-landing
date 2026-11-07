@@ -138,50 +138,40 @@
 }
 
 @include mixins.below("mobile") {
-  .stage {
-    padding-block: calc(var(--header-height) + var(--space-xl)) var(--space-xl);
-  }
-
-  .track {
-    flex-direction: column;
-    width: 100%;
-    height: auto;
-    transform: none !important;
-  }
-
   .panel {
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
     align-items: flex-start;
-    width: 100%;
-    height: auto;
-    padding-block: var(--space-lg);
+    width: 90vw;
+    padding-block: calc(var(--header-height) + var(--space-lg)) var(--mobile-dock);
     padding-inline: var(--page-gutter);
   }
 
-  .copy,
+  .copy {
+    flex: none;
+    gap: var(--space-2xs);
+    width: 100%;
+  }
+
   .text {
     width: 100%;
   }
 
-  .anchor {
-    flex: none;
-    width: 100%;
-    height: 42vh;
-  }
-
+  .anchor,
   .frame {
-    flex: none;
+    flex: 1;
     width: 100%;
-    height: 42vh;
+    height: auto;
+    min-height: 0;
   }
 
   .inset {
-    width: 100%;
+    width: 46vw;
+    aspect-ratio: 16 / 9;
   }
 
   .line {
-    display: none;
+    right: var(--mobile-dock);
   }
 }
 
@@ -197,6 +187,12 @@
     width: 100%;
     min-height: 70vh;
     height: auto;
+  }
+
+  .anchor,
+  .frame {
+    flex: 1;
+    min-height: 42vh;
   }
 
   .line {

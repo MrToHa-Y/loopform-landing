@@ -6,8 +6,7 @@
   height: var(--stack-height);
 }
 
-.overlap,
-.overlapDesktop {
+.overlap {
   margin-top: -100vh;
 }
 
@@ -18,29 +17,12 @@
   overflow: clip;
 }
 
-@include mixins.below("mobile") {
-  .overlapDesktop {
-    margin-top: 0;
-  }
-
-  .flowOnMobile {
-    height: auto;
-
-    .sticky {
-      position: relative;
-      height: auto;
-      overflow: visible;
-    }
-  }
-}
-
 @include mixins.reduced-motion {
   .section {
     height: auto;
   }
 
-  .overlap,
-  .overlapDesktop {
+  .overlap {
     margin-top: 0;
   }
 

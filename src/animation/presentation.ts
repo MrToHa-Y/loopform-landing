@@ -27,11 +27,11 @@ function sectionIndex(id: SectionId) {
 }
 
 export function buildFrames() {
-  const { compact, reducedMotion } = useScrollStore.getState()
+  const { reducedMotion } = useScrollStore.getState()
   const frames: Frame[] = []
   const add = (id: SectionId, y: number) => frames.push({ y, section: sectionIndex(id) })
   const points = presentationPoints
-  const detailed = !compact && !reducedMotion
+  const detailed = !reducedMotion
 
   add("intro", 0)
 

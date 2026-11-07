@@ -24,11 +24,23 @@ export function Business() {
     () => {
       const grid = gridRef.current
 
-      if (!layoutReady || !grid || reducedMotion || compact) {
+      if (!layoutReady || !grid || reducedMotion) {
         return
       }
 
       const cards = gsap.utils.toArray<HTMLElement>("[data-business-card]", grid)
+
+      if (compact) {
+        gsap.from(cards, {
+          yPercent: (index: number) => -100 * index,
+          duration: durations.slow,
+          stagger: staggers.cards,
+          ease: eases.out,
+          scrollTrigger: { trigger: grid, start: "top 82%", toggleActions: "play none none reverse" },
+        })
+        return
+      }
+
       const toggle = (spread: boolean) => {
         const state = Flip.getState(cards)
 
@@ -63,7 +75,7 @@ export function Business() {
       id="business"
       theme="accent"
       label={ru.sections[9]?.title ?? ""}
-      overlap="always"
+      overlap
       sectionRef={sectionRef}
       className={styles.root}
     >
