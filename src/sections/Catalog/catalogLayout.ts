@@ -1,6 +1,8 @@
 import { formatNumber } from "@/components/Counter/formatNumber"
 
 export interface BlockRect {
+  originX: number
+  originY: number
   left: number
   top: number
   width: number
@@ -61,6 +63,8 @@ export function previewBlock(grid: HTMLElement, index: number, rowSpan: number):
   }
 
   return {
+    originX: grid.offsetLeft,
+    originY: grid.offsetTop,
     left,
     top,
     width,

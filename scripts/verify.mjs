@@ -351,7 +351,11 @@ try {
       const twoRows = cards[2].offsetTop + cards[2].offsetHeight - cards[0].offsetTop
       const twoColumns = cards[1].offsetLeft + cards[1].offsetWidth - cards[0].offsetLeft
 
-      return { width: region.offsetWidth, grid: twoColumns, height: region.offsetHeight, twoRows }
+      const grid = cards[0].offsetParent
+      const shiftX = region.offsetLeft - (grid.offsetLeft + cards[0].offsetLeft)
+      const shiftY = region.offsetTop - (grid.offsetTop + cards[0].offsetTop)
+
+      return { width: region.offsetWidth, grid: twoColumns, height: region.offsetHeight, twoRows, shiftX, shiftY }
     })
     await page.evaluate(() => window.__lenis.scrollTo(window.scrollY + 140, { immediate: true, force: true }))
     await page.waitForTimeout(700)
@@ -362,7 +366,7 @@ try {
     const closedOnTap = await page.evaluate(() => document.querySelector("[data-section='catalog'] [role='region']") === null)
     report(
       "phone catalog preview spans four cards and survives scrolling",
-      phonePreview !== null && Math.abs(phonePreview.width - phonePreview.grid) < 3 && Math.abs(phonePreview.height - phonePreview.twoRows) < 3 && keptOnScroll && closedOnTap,
+      phonePreview !== null && Math.abs(phonePreview.width - phonePreview.grid) < 3 && Math.abs(phonePreview.height - phonePreview.twoRows) < 3 && Math.abs(phonePreview.shiftX) < 2 && Math.abs(phonePreview.shiftY) < 2 && keptOnScroll && closedOnTap,
       JSON.stringify({ ...phonePreview, keptOnScroll, closedOnTap }),
     )
     const configuratorTop = await page.evaluate(() => (document.querySelector("[data-section='configurator']").getBoundingClientRect().top + window.scrollY) / window.innerHeight * 100)

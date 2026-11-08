@@ -279,8 +279,8 @@ export function Catalog() {
 
   const previewStyle = block
     ? ({
-        left: `${block.left}px`,
-        top: `${block.top}px`,
+        left: `${block.originX + block.left}px`,
+        top: `${block.originY + block.top}px`,
         width: `${block.width}px`,
         height: `${block.height}px`,
       } as CSSProperties)
