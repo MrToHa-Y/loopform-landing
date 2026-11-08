@@ -398,11 +398,13 @@ export function createCapPile(capacity: number, random: () => number) {
     }
   }
 
-  const advancePhase = (delta: number) => {
+  const advancePhase = (delta: number, pouring: boolean) => {
     phaseTime += delta
 
     if (phase === "pour") {
-      pour(delta)
+      if (pouring) {
+        pour(delta)
+      }
     } else if (phase === "hold" && phaseTime > holdSeconds) {
       phase = "drain"
       phaseTime = 0
@@ -421,9 +423,9 @@ export function createCapPile(capacity: number, random: () => number) {
     }
   }
 
-  const step = (delta: number, pointer: PilePointer | null) => {
+  const step = (delta: number, pointer: PilePointer | null, pouring = true) => {
     clock += delta
-    advancePhase(delta)
+    advancePhase(delta, pouring)
 
     if (pointer) {
       stir(pointer, delta)
@@ -455,6 +457,7 @@ export function createCapPile(capacity: number, random: () => number) {
     resize,
     step,
     settle,
+    restart: clear,
     phase: () => phase,
     limit: () => limit,
     width: () => width,

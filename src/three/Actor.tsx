@@ -18,7 +18,9 @@ interface ActorProps {
   options?: VariantSelection
 }
 
-const terrazzoSpeckle = 0.3
+const terrazzoSpeckle = 0.34
+const terrazzoScale = 64
+const terrazzoSpeckles = ["cap-red", "cap-blue", "bottle-green"] as const
 const stretchLimit = 75 / 45
 const colorDamping = 7
 const stateDamping = 5
@@ -111,12 +113,17 @@ export function Actor({ id, model: modelOverride, options }: ActorProps) {
 
       targetColor.current.copy(paletteColor(natural ? parts.look.color : (option?.token ?? "cap-red")))
       uniforms.uBaseColor.value.lerp(targetColor.current, 1 - Math.exp(-colorDamping * delta))
+      const terrazzo = config.color === "terrazzo"
+      const speckles = terrazzo ? terrazzoSpeckles : parts.look.speckle
+
       uniforms.uSpeckleAmount.value = MathUtils.damp(
         uniforms.uSpeckleAmount.value,
-        config.color === "terrazzo" ? terrazzoSpeckle : parts.look.speckleAmount,
+        terrazzo ? terrazzoSpeckle : parts.look.speckleAmount,
         colorDamping,
         delta,
       )
+      uniforms.uSpeckleScale.value = terrazzo ? terrazzoScale : parts.look.speckleScale
+      uniforms.uSpeckle.value.forEach((color, index) => color.copy(paletteColor(speckles[index] ?? "bone")))
       uniforms.uRelief.value = MathUtils.damp(uniforms.uRelief.value, config.texture === "relief" ? 1 : 0.3, stateDamping, delta)
       uniforms.uLegStretch.value = MathUtils.damp(
         uniforms.uLegStretch.value,

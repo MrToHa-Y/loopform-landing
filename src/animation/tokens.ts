@@ -81,7 +81,7 @@ export const segments = {
   problem: {
     problemFall: [0, 70],
     problemRise: [70, 130],
-    problemOut: [130, 230],
+    problemOut: [140, 250],
   },
   melt: {
     meltEnter: [-100, 0],
@@ -89,7 +89,7 @@ export const segments = {
   },
   process: {
     processEnter: [-100, 0],
-    processTrack: [0, 200],
+    processTrack: [30, 200],
     processLeave: [200, 300],
   },
   passport: {
@@ -148,7 +148,7 @@ export const catalogPreview = {
   startScale: 0.96,
   closeSpeed: 1.6,
   rowSpan: 2,
-  touchRowSpan: 3,
+  tapSlop: 10,
 } as const
 
 export const capPileCounts = {

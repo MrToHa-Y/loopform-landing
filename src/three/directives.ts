@@ -43,6 +43,8 @@ export const shardDirective = {
 
 export const processDirective = {
   visible: false,
+  pouring: true,
+  refill: 0,
 }
 
 export const meltDirective = {

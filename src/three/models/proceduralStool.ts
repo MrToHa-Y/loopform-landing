@@ -1,3 +1,4 @@
+import type { BufferGeometry } from "three"
 import { finishGeometry, latheSurface, pillowGeometry } from "./geometryUtils"
 import type { ProfilePoint } from "./geometryUtils"
 
@@ -40,6 +41,16 @@ const singleWave: readonly ProfilePoint[] = [
   [0, 0.436],
 ]
 
+function includeCushion(main: BufferGeometry, cushion: BufferGeometry) {
+  cushion.computeBoundingBox()
+
+  if (main.boundingBox && cushion.boundingBox) {
+    main.boundingBox.union(cushion.boundingBox)
+  }
+
+  return main
+}
+
 export function createStoolParts(shape = "double") {
   const cushion = pillowGeometry(0.152, 0.152, 0.066, 2)
 
@@ -47,7 +58,7 @@ export function createStoolParts(shape = "double") {
 
   const main = finishGeometry(latheSurface(shape === "single" ? singleWave : doubleWave, 96, 150), null, [cushion])
 
-  return { main, cushion }
+  return { main: includeCushion(main, cushion), cushion }
 }
 
 export function createBarStoolParts() {
@@ -80,5 +91,5 @@ export function createBarStoolParts() {
     [cushion],
   )
 
-  return { main, cushion }
+  return { main: includeCushion(main, cushion), cushion }
 }

@@ -24,6 +24,8 @@ const morphPivot = new Matrix4()
 const collectionActors: ActorId[] = ["tolqyn", "tas", "qum", "saule"]
 const collectionFill = [1, 0.74, 0.86, 0.78]
 const largestPlanter = 45
+const pourThreshold = 0.78
+const frameMouth = 0.38
 
 function partsFor(id: ActorId) {
   return getModelParts(actorModels[id], actorOptions[id])
@@ -199,8 +201,18 @@ function updateHeroAndCollection(size: StageSize) {
   return true
 }
 
+let previousOut = 0
+
 function updateProblem(size: StageSize) {
   const out = readProgress("problemOut")
+  const frame = readAnchor("process-caps", size.width, size.height)
+
+  if (out >= pourThreshold && previousOut < pourThreshold) {
+    processDirective.refill += 1
+  }
+
+  previousOut = out
+  processDirective.pouring = out >= pourThreshold || readProgress("processEnter") >= 1
   const fall = readProgress("problemFall")
   const rise = readProgress("problemRise")
   const anchor = readAnchor("problem-silhouette", size.width, size.height, true)
@@ -217,8 +229,13 @@ function updateProblem(size: StageSize) {
   particleDirective.paletteMode = true
 
   if (out > 0) {
-    particleDirective.nozzle.set(anchor.x, -worldHeight * 0.8, 0)
-    setParticles("silhouette", "intake", range(out, 0.2, 0.8))
+    if (frame) {
+      particleDirective.nozzle.set(frame.x, frame.y + frame.height * frameMouth, 0)
+    } else {
+      particleDirective.nozzle.set(anchor.x, -worldHeight * 0.8, 0)
+    }
+
+    setParticles("silhouette", "intake", range(out, 0.15, pourThreshold))
   } else if (rise > 0) {
     setParticles("heap", "silhouette", rise)
   } else {

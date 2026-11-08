@@ -294,8 +294,19 @@
     padding: var(--space-xs);
   }
 
+  .detailsName {
+    font-size: var(--text-lead);
+  }
+
+  .detailsType,
+  .specWide {
+    display: none;
+  }
+
   .specs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3xs) var(--space-xs);
+    padding-block: var(--space-3xs);
   }
 
   .buy {

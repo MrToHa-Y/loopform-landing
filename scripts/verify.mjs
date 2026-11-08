@@ -334,6 +334,37 @@ try {
       return { gap: cards[1].left - cards[0].right, inside: caption.right <= cards[0].right }
     })
     report("phone catalog captions stay inside their card", catalog.gap >= 12 && catalog.inside, JSON.stringify(catalog))
+
+    await page.evaluate(() => document.querySelector("[data-section='catalog'] ul").scrollIntoView({ block: "center" }))
+    await page.waitForTimeout(900)
+    const tapCard = await page.locator("[data-card]").nth(2).boundingBox()
+    await page.touchscreen.tap(tapCard.x + tapCard.width / 2, tapCard.y + tapCard.height / 3)
+    await page.waitForTimeout(1500)
+    const phonePreview = await page.evaluate(() => {
+      const region = document.querySelector("[data-section='catalog'] [role='region']")
+      const cards = [...document.querySelectorAll("[data-card]")]
+
+      if (!region) {
+        return null
+      }
+
+      const twoRows = cards[2].offsetTop + cards[2].offsetHeight - cards[0].offsetTop
+      const twoColumns = cards[1].offsetLeft + cards[1].offsetWidth - cards[0].offsetLeft
+
+      return { width: region.offsetWidth, grid: twoColumns, height: region.offsetHeight, twoRows }
+    })
+    await page.evaluate(() => window.__lenis.scrollTo(window.scrollY + 140, { immediate: true, force: true }))
+    await page.waitForTimeout(700)
+    const keptOnScroll = await page.evaluate(() => document.querySelector("[data-section='catalog'] [role='region']") !== null)
+    const heading = await page.locator("[data-section='catalog'] h2").boundingBox()
+    await page.touchscreen.tap(heading.x + 20, heading.y + heading.height / 2)
+    await page.waitForTimeout(1300)
+    const closedOnTap = await page.evaluate(() => document.querySelector("[data-section='catalog'] [role='region']") === null)
+    report(
+      "phone catalog preview spans four cards and survives scrolling",
+      phonePreview !== null && Math.abs(phonePreview.width - phonePreview.grid) < 3 && Math.abs(phonePreview.height - phonePreview.twoRows) < 3 && keptOnScroll && closedOnTap,
+      JSON.stringify({ ...phonePreview, keptOnScroll, closedOnTap }),
+    )
     const configuratorTop = await page.evaluate(() => (document.querySelector("[data-section='configurator']").getBoundingClientRect().top + window.scrollY) / window.innerHeight * 100)
 
     await jump(page, configuratorTop + 20)

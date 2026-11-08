@@ -118,7 +118,7 @@ export function Catalog() {
       timelineRef.current?.progress(0).kill()
       timelineRef.current = null
 
-      const next = previewBlock(grid, index, hoverMode ? catalogPreview.rowSpan : catalogPreview.touchRowSpan)
+      const next = previewBlock(grid, index, catalogPreview.rowSpan)
       const gridTop = grid.getBoundingClientRect().top
       const blockTop = gridTop + next.top
       const blockBottom = blockTop + next.height
@@ -202,18 +202,29 @@ export function Catalog() {
       }
     }
 
-    const handleOutside = (event: PointerEvent) => {
-      if (!hoverMode && previewRef.current && !previewRef.current.contains(event.target as Node)) {
+    const start = { x: 0, y: 0 }
+
+    const handleDown = (event: PointerEvent) => {
+      start.x = event.clientX
+      start.y = event.clientY
+    }
+
+    const handleUp = (event: PointerEvent) => {
+      const tapped = Math.hypot(event.clientX - start.x, event.clientY - start.y) < catalogPreview.tapSlop
+
+      if (!hoverMode && tapped && previewRef.current && !previewRef.current.contains(event.target as Node)) {
         close()
       }
     }
 
     window.addEventListener("keydown", handleKey)
-    window.addEventListener("pointerdown", handleOutside)
+    window.addEventListener("pointerdown", handleDown)
+    window.addEventListener("pointerup", handleUp)
 
     return () => {
       window.removeEventListener("keydown", handleKey)
-      window.removeEventListener("pointerdown", handleOutside)
+      window.removeEventListener("pointerdown", handleDown)
+      window.removeEventListener("pointerup", handleUp)
     }
   }, [active, close, hoverMode])
 
@@ -222,7 +233,12 @@ export function Catalog() {
       return
     }
 
-    const handleResize = () => close()
+    const width = window.innerWidth
+    const handleResize = () => {
+      if (window.innerWidth !== width) {
+        close()
+      }
+    }
 
     window.addEventListener("resize", handleResize)
 

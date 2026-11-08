@@ -61,6 +61,7 @@ export function ProcessIllustrations() {
   const rootRef = useRef<Group>(null)
   const capsRef = useRef<InstancedMesh>(null)
   const settled = useRef(false)
+  const refill = useRef(processDirective.refill)
   const capGeometry = useMemo(createCapGeometry, [])
   const capacity = capPileCounts.desktop
   const pile = useMemo(() => createCapPile(capacity, createRandom(71)), [capacity])
@@ -157,7 +158,12 @@ export function ProcessIllustrations() {
         pointer.velocityY = -pointerField.velocityY / unitPixels
       }
 
-      pile.step(Math.min(delta, maxDelta), inside ? pointer : null)
+      if (refill.current !== processDirective.refill) {
+        refill.current = processDirective.refill
+        pile.restart()
+      }
+
+      pile.step(Math.min(delta, maxDelta), inside ? pointer : null, processDirective.pouring)
     }
 
     for (let index = 0; index < capacity; index += 1) {
