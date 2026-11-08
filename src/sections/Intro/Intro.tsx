@@ -4,6 +4,7 @@ import { durations, eases, staggers } from "@/animation/tokens"
 import { useSectionProgress } from "@/animation/useSectionProgress"
 import { FitText } from "@/components/FitText/FitText"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Intro.module.scss"
 
@@ -87,7 +88,7 @@ export function Intro() {
   )
 
   return (
-    <section ref={sectionRef} data-section="intro" data-theme="dark" className={styles.root} aria-label={ru.sections[0]?.title}>
+    <section ref={sectionRef} data-section="intro" data-theme="dark" className={styles.root} aria-label={sectionTitle("intro")}>
       <div ref={textRef} className={styles.text}>
         <FitText as="p" lines={intro.lines} widthVw={92} maxHeightVh={62} className={styles.title} />
       </div>

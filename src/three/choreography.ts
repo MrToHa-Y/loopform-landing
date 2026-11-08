@@ -1,7 +1,7 @@
 import { Euler, Quaternion, Vector3, Matrix4 } from "three"
 import { motion } from "@/animation/tokens"
 import { readProgress, collectionRig, configuratorRig, configuratorView, heroRig, useScrollStore } from "@/state/scrollStore"
-import { actorIds, actorModels, actorTargets } from "@/three/actors"
+import { actorIds, actorModels, actorOptions, actorTargets } from "@/three/actors"
 import type { ActorId, ActorTarget } from "@/three/actors"
 import { mixRects, readAnchor, worldHeight } from "@/three/anchors"
 import type { WorldRect } from "@/three/anchors"
@@ -23,6 +23,11 @@ const morphScale = new Vector3()
 const morphPivot = new Matrix4()
 const collectionActors: ActorId[] = ["tolqyn", "tas", "qum", "saule"]
 const collectionFill = [1, 0.74, 0.86, 0.78]
+const largestPlanter = 45
+
+function partsFor(id: ActorId) {
+  return getModelParts(actorModels[id], actorOptions[id])
+}
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value))
@@ -59,7 +64,7 @@ function resetActors() {
 }
 
 function fit(id: ActorId, rect: WorldRect, fill = 1) {
-  const size = getModelParts(actorModels[id]).size
+  const size = partsFor(id).size
   return Math.min(rect.height / size.y, rect.width / Math.max(size.x, size.z)) * fill
 }
 
@@ -77,8 +82,8 @@ function place(id: ActorId, rect: WorldRect, fill = 1): ActorTarget {
 
 function setNozzle(id: ActorId) {
   const target = actorTargets[id]
-  const height = getModelParts(actorModels[id]).size.y * target.scale
-  const width = getModelParts(actorModels[id]).size.x * target.scale
+  const height = partsFor(id).size.y * target.scale
+  const width = partsFor(id).size.x * target.scale
 
   nozzleDirective.active = target.print > 0.004 && target.print < 0.996
   nozzleDirective.position.set(target.x, target.y - height / 2 + height * target.print, 0.6)
@@ -88,7 +93,7 @@ function setNozzle(id: ActorId) {
 
 function setShadow(id: ActorId, opacity: number) {
   const target = actorTargets[id]
-  const size = getModelParts(actorModels[id]).size
+  const size = partsFor(id).size
 
   shadowDirective.visible = opacity > 0.01
   shadowDirective.position.set(target.x, target.y - (size.y * target.scale) / 2, -0.2)
@@ -152,8 +157,8 @@ function updateHeroAndCollection(size: StageSize) {
     target.visible = state.print > 0.001
     target.scale *= shrink
     target.y += lift
-    target.rotationX = getModelParts(actorModels[id]).look.displayPitch * degrees
-    target.rotationY = (getModelParts(actorModels[id]).look.displayYaw + Math.sin(time * 0.3) * 4) * degrees
+    target.rotationX = partsFor(id).look.displayPitch * degrees
+    target.rotationY = (partsFor(id).look.displayYaw + Math.sin(time * 0.3) * 4) * degrees
     target.rotationZ = 0
     target.print = state.print
     target.direction = state.direction
@@ -212,7 +217,7 @@ function updateProblem(size: StageSize) {
   particleDirective.paletteMode = true
 
   if (out > 0) {
-    particleDirective.nozzle.set(meltDirective.x, meltDirective.y, 0)
+    particleDirective.nozzle.set(anchor.x, -worldHeight * 0.8, 0)
     setParticles("silhouette", "intake", range(out, 0.2, 0.8))
   } else if (rise > 0) {
     setParticles("heap", "silhouette", rise)
@@ -303,11 +308,13 @@ function updateConfigurator(size: StageSize) {
   const view = configuratorView
   const chair = place("configChair", anchor, 0.74)
 
+  const planter = Number(useScrollStore.getState().configurator.variants.size ?? 0)
+
   chair.x += view.x
   chair.y += view.y
-  chair.scale *= view.zoom
-  chair.rotationX = (view.pitch + getModelParts(actorModels.configChair).look.displayPitch) * degrees
-  chair.rotationY = (getModelParts(actorModels.configChair).look.displayYaw + view.yaw) * degrees
+  chair.scale *= view.zoom * (planter > 0 ? planter / largestPlanter : 1)
+  chair.rotationX = (view.pitch + partsFor("configChair").look.displayPitch) * degrees
+  chair.rotationY = (partsFor("configChair").look.displayYaw + view.yaw) * degrees
   chair.rotationZ = 0
   chair.rotationStiffness = 9
   chair.print = smooth(range(enter, 0.2, 1)) * configuratorRig.print
@@ -322,7 +329,7 @@ function updateMelt(size: StageSize) {
   const melt = meltDirective
   const anchor = readAnchor("melt-product", width, height)
   const top = readAnchor("melt-top", width, height)
-  const seam = readAnchor("process-top", width, height)
+  const seam = readAnchor("advantages-top", width, height)
   const enter = readProgress("meltEnter")
 
   melt.visible = false
@@ -401,14 +408,14 @@ function updateStatic(size: StageSize) {
 
   collectionActors.forEach((id, index) => {
     if (index > 0) {
-      placeStatic(id, `collection-product-${index}`, size, getModelParts(actorModels[id]).look.displayYaw, 0, (collectionFill[index] ?? 1) * 0.86)
+      placeStatic(id, `collection-product-${index}`, size, partsFor(id).look.displayYaw, 0, (collectionFill[index] ?? 1) * 0.86)
     }
   })
 
   placeStatic("stool", "passport-stool", size, 10)
   placeStatic("configChair", "configurator-product", size, -25, 0, 0.88)
 
-  actorTargets.configChair.rotationY = (getModelParts(actorModels.configChair).look.displayYaw + configuratorView.yaw) * degrees
+  actorTargets.configChair.rotationY = (partsFor("configChair").look.displayYaw + configuratorView.yaw) * degrees
   processDirective.visible = inView(readAnchor("process-caps", size.width, size.height), size.height)
 }
 

@@ -141,6 +141,16 @@ export const footerPhysics = {
   flakesMobile: 40,
 } as const
 
+export const catalogPreview = {
+  hoverDelayMs: 100,
+  galleryStepMs: 1100,
+  shiftVw: 2.5,
+  startScale: 0.96,
+  closeSpeed: 1.6,
+  rowSpan: 2,
+  touchRowSpan: 3,
+} as const
+
 export const capPileCounts = {
   desktop: 340,
   mobile: 240,

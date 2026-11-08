@@ -19,7 +19,7 @@ import { attachPointerField } from "@/three/pointerField"
 import { PrintNozzle } from "@/three/PrintNozzle"
 import { ProcessIllustrations } from "@/three/ProcessIllustrations"
 import { StageLights } from "@/three/StageLights"
-import { renderThumbnails } from "@/three/thumbnailRenderer"
+import { renderProductViews, renderThumbnails } from "@/three/thumbnailRenderer"
 import styles from "./Stage.module.scss"
 
 const FooterPhysics = lazy(() => import("@/three/physics/FooterPhysics"))
@@ -47,7 +47,7 @@ function FrameLoopController() {
       return
     }
 
-    const start = document.querySelector("[data-section='philosophy']")
+    const start = document.querySelector("[data-section='advantages']")
     const end = document.querySelector("[data-section='cta']")
 
     if (!start || !end) {
@@ -71,6 +71,13 @@ function FrameLoopController() {
 function ReadySignal() {
   const set = useScrollStore((state) => state.set)
   const preloaderDone = useScrollStore((state) => state.preloaderDone)
+  const catalogViewsWanted = useScrollStore((state) => state.catalogViewsWanted)
+
+  useEffect(() => {
+    if (preloaderDone && catalogViewsWanted) {
+      renderProductViews()
+    }
+  }, [preloaderDone, catalogViewsWanted])
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {

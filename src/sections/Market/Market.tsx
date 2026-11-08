@@ -4,6 +4,7 @@ import { eases, sectionHeights } from "@/animation/tokens"
 import { Counter } from "@/components/Counter/Counter"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Market.module.scss"
 
@@ -55,7 +56,7 @@ export function Market() {
     <StackSection
       id="market"
       theme="light"
-      label={ru.sections[13]?.title ?? ""}
+      label={sectionTitle("market")}
       sectionRef={sectionRef}
       className={styles.root}
     >

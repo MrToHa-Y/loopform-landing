@@ -5,6 +5,7 @@ import { useSectionProgress } from "@/animation/useSectionProgress"
 import { FitText } from "@/components/FitText/FitText"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { heroRig, readProgress, useScrollStore } from "@/state/scrollStore"
 import { createRandom } from "@/three/random"
 import styles from "./Hero.module.scss"
@@ -123,7 +124,7 @@ export function Hero() {
     <StackSection
       id="hero"
       theme="light"
-      label={ru.sections[1]?.title ?? ""}
+      label={sectionTitle("hero")}
       heightVh={sectionHeights.hero}
       themeOffsetVh={100}
       sectionRef={sectionRef}

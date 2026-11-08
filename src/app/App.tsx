@@ -49,12 +49,12 @@ function App() {
         <Collection />
         <Catalog />
         <Problem />
-        <Melt />
         <Process />
         <Passport />
         <Configurator />
         <Manifesto />
         <Philosophy />
+        <Melt />
         <Advantages />
         <Business />
         <Market />

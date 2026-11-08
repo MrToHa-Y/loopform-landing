@@ -6,6 +6,7 @@ import { useSectionProgress } from "@/animation/useSectionProgress"
 import { FitText } from "@/components/FitText/FitText"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Manifesto.module.scss"
 
@@ -90,7 +91,7 @@ export function Manifesto() {
     <StackSection
       id="manifesto"
       theme="light"
-      label={ru.sections[9]?.title ?? ""}
+      label={sectionTitle("manifesto")}
       heightVh={sectionHeights.manifesto}
       sectionRef={sectionRef}
       className={styles.root}

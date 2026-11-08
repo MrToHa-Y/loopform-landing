@@ -8,9 +8,10 @@ import { MagneticButton } from "@/components/MagneticButton/MagneticButton"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { productPhotos } from "@/content/images"
 import { ru } from "@/content/ru"
-import type { CatalogModelId, ConfiguratorGroupId } from "@/content/types"
+import { sectionTitle } from "@/content/sectionTitle"
+import type { CatalogModelId, ConfiguratorGroupId, VariantGroup } from "@/content/types"
 import { configuratorRig, configuratorView, thumbnails, useScrollStore } from "@/state/scrollStore"
-import { buildTelegramLink, computeResult, findModel } from "./configuratorResult"
+import { buildTelegramLink, computeResult, defaultVariants, findModel, modelById } from "./configuratorResult"
 import { PanelGroup } from "./PanelGroup"
 import { Segmented } from "./Segmented"
 import { useViewGestures } from "./useViewGestures"
@@ -32,7 +33,7 @@ export function Configurator() {
   useScrollStore((store) => store.thumbnailsVersion)
   const { configurator } = ru
   const model = findModel(state)
-  const adjustable = model?.adjustable ?? false
+  const variantGroups = model?.variants ?? []
   const result = computeResult(state)
   const angles: number[] = []
 
@@ -40,9 +41,9 @@ export function Configurator() {
     angles.push(angle)
   }
 
-  const groups: ConfiguratorGroupId[] = adjustable
-    ? ["model", "color", "height", "texture", "cushion"]
-    : ["model", "color", "texture"]
+  const groups: ConfiguratorGroupId[] = ["model", "color", ...variantGroups.map((group) => group.id), "texture"]
+  const groupLabel = (id: ConfiguratorGroupId) =>
+    variantGroups.find((group) => group.id === id)?.tab ?? (id in configurator.tabs ? configurator.tabs[id as keyof typeof configurator.tabs] : id)
 
   useSectionProgress(sectionRef, "configurator")
 
@@ -81,27 +82,44 @@ export function Configurator() {
     syncAngle()
   }
 
-  const selectModel = (id: CatalogModelId) => {
-    if (id === state.model) {
-      return
-    }
-
+  const reprint = (apply: () => void) => {
     gsap.to(configuratorRig, {
       print: 0,
       duration: durations.fast,
       ease: eases.inOut,
       overwrite: true,
       onComplete: () => {
-        setConfigurator({
-          model: id,
-          color: configurator.models.find((item) => item.id === id)?.color ?? "cap-red",
-          height: "dining",
-          cushion: "none",
-        })
-        resetView()
+        apply()
         gsap.to(configuratorRig, { print: 1, duration: durations.print, ease: eases.out })
       },
     })
+  }
+
+  const selectModel = (id: CatalogModelId) => {
+    if (id === state.model) {
+      return
+    }
+
+    reprint(() => {
+      const next = modelById(id)
+
+      setConfigurator({ model: id, color: next?.color ?? "cap-red", variants: defaultVariants(next) })
+      resetView()
+    })
+  }
+
+  const selectVariant = (group: VariantGroup, choice: string) => {
+    if (state.variants[group.id] === choice) {
+      return
+    }
+
+    const apply = () => setConfigurator({ variants: { ...useScrollStore.getState().configurator.variants, [group.id]: choice } })
+
+    if (group.rebuild) {
+      reprint(apply)
+    } else {
+      apply()
+    }
   }
 
   useEffect(() => {
@@ -114,7 +132,7 @@ export function Configurator() {
     <StackSection
       id="configurator"
       theme="light"
-      label={ru.sections[8]?.title ?? ""}
+      label={sectionTitle("configurator")}
       heightVh={sectionHeights.configurator}
       overlap
       sectionRef={sectionRef}
@@ -170,13 +188,13 @@ export function Configurator() {
                 className={`${styles.tab} ${group === activeGroup ? styles.tabActive : ""}`}
                 onClick={() => setActiveGroup(group)}
               >
-                {configurator.tabs[group]}
+                {groupLabel(group)}
               </button>
             ))}
           </div>
 
           <PanelGroup title={configurator.groups.model} active={activeGroup === "model"}>
-            <div className={styles.models} data-lenis-prevent>
+            <div className={styles.models}>
               {configurator.models.map((item) => {
                 const image = productPhotos[item.id] ?? thumbnails.get(item.id)
 
@@ -214,15 +232,15 @@ export function Configurator() {
             </div>
           </PanelGroup>
 
-          {adjustable ? (
-            <PanelGroup title={configurator.groups.height} active={activeGroup === "height"}>
+          {variantGroups.map((group) => (
+            <PanelGroup key={group.id} title={group.label} active={activeGroup === group.id}>
               <Segmented
-                options={configurator.heights}
-                value={state.height}
-                onChange={(height) => setConfigurator({ height })}
+                options={group.choices}
+                value={state.variants[group.id] ?? group.defaultId ?? group.choices[0]?.id ?? ""}
+                onChange={(choice) => selectVariant(group, choice)}
               />
             </PanelGroup>
-          ) : null}
+          ))}
 
           <PanelGroup title={configurator.groups.texture} active={activeGroup === "texture"}>
             <Segmented
@@ -231,16 +249,6 @@ export function Configurator() {
               onChange={(texture) => setConfigurator({ texture })}
             />
           </PanelGroup>
-
-          {adjustable ? (
-            <PanelGroup title={configurator.groups.cushion} active={activeGroup === "cushion"}>
-              <Segmented
-                options={configurator.cushions}
-                value={state.cushion}
-                onChange={(cushion) => setConfigurator({ cushion })}
-              />
-            </PanelGroup>
-          ) : null}
 
           <PanelGroup title={configurator.groups.angle} active pinned>
             <div className={styles.angles}>

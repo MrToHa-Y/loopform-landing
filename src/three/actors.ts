@@ -1,5 +1,5 @@
 import { motion } from "@/animation/tokens"
-import type { CatalogModelId } from "@/content/types"
+import type { CatalogModelId, VariantSelection } from "@/content/types"
 
 export type ActorId =
   | "tolqyn"
@@ -53,6 +53,8 @@ export const actorModels: Record<ActorId, CatalogModelId> = {
   stool: "tas",
   configChair: "tolqyn",
 }
+
+export const actorOptions: Partial<Record<ActorId, VariantSelection>> = {}
 
 export const actorIds = Object.keys(actorModels) as ActorId[]
 

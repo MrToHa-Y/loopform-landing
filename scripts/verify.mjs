@@ -161,7 +161,7 @@ try {
       link: [...document.querySelectorAll("[data-section='configurator'] a")].find((node) => node.textContent === "Отправить заявку").href,
     }))
     const decoded = Buffer.from(configurator.link.split("start=")[1], "base64url").toString()
-    report("configurator recalculates and builds link", configurator.price === "75 700 ₸" && decoded === "tolqyn.terrazzo.bar.relief.felt.135", `${configurator.price} ${decoded}`)
+    report("configurator recalculates and builds link", configurator.price === "75 700 ₸" && decoded === "tolqyn.terrazzo.bar.felt.relief.135", `${configurator.price} ${decoded}`)
 
     const pageText = await page.evaluate(() => document.body.textContent)
     report("images carry no AI caption", !pageText.includes("Изображение создано ИИ"))
@@ -206,6 +206,33 @@ try {
     await page.waitForTimeout(1200)
     const secondFrame = await page.screenshot({ clip })
     report("process caps keep moving", !firstFrame.equals(secondFrame))
+    await page.evaluate(() => document.querySelector("[data-section='catalog'] ul").scrollIntoView({ block: "center" }))
+    await page.waitForTimeout(1200)
+    const catalogCard = await page.locator("[data-card]").nth(6).boundingBox()
+    await page.mouse.move(catalogCard.x + catalogCard.width / 2, catalogCard.y + catalogCard.height / 3)
+    await page.waitForTimeout(1400)
+    const previewOpen = await page.evaluate(() => {
+      const region = document.querySelector("[data-section='catalog'] [role='region']")
+
+      return region ? { visible: getComputedStyle(region).visibility === "visible", caps: region.textContent.includes("Крышек"), name: region.getAttribute("aria-label") } : null
+    })
+    await page.mouse.move(5, 5)
+    await page.waitForTimeout(1200)
+    const previewClosed = await page.evaluate(() => document.querySelector("[data-section='catalog'] [role='region']") === null)
+    report("catalog preview opens on hover and closes", previewOpen?.visible === true && previewOpen.caps && previewClosed, JSON.stringify(previewOpen))
+
+    const variantPrice = await page.evaluate(async () => {
+      const buttons = () => [...document.querySelectorAll("[data-section='configurator'] button")]
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+      buttons().find((node) => node.textContent.includes("UYA"))?.click()
+      await wait(1500)
+      buttons().find((node) => node.textContent.trim() === "6")?.click()
+      await wait(1500)
+
+      return document.querySelector("[data-section='configurator'] dd .sr-only").textContent
+    })
+    report("configurator variants change the price", variantPrice === "59 400 ₸", variantPrice)
     report("no console errors on desktop", errors.length === 0, errors.slice(0, 3).join(" | "))
     await context.close()
   }
@@ -291,6 +318,14 @@ try {
     await jump(page, processTop + 100)
     await page.waitForTimeout(1200)
     const shift = await page.evaluate(() => new DOMMatrix(getComputedStyle(document.querySelector("[data-section='process'] ol")).transform).m41)
+    const phoneFrames = await page.evaluate(() =>
+      [...document.querySelectorAll("[data-section='process'] figure")].map((node) => {
+        const box = node.getBoundingClientRect()
+
+        return `${Math.round(box.width)}x${Math.round(box.height)}@${Math.round(box.top)}`
+      }),
+    )
+    report("phone process photos share one size", new Set(phoneFrames).size === 1, phoneFrames.join(" "))
     report("phone process moves horizontally", shift < -100, String(Math.round(shift)))
 
     const catalog = await page.evaluate(() => {

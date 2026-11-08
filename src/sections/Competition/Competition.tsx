@@ -3,6 +3,7 @@ import { gsap, useGSAP } from "@/animation/gsap"
 import { durations, eases, staggers } from "@/animation/tokens"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Competition.module.scss"
 
@@ -32,7 +33,7 @@ export function Competition() {
   )
 
   return (
-    <StackSection id="competition" theme="dark" label={ru.sections[14]?.title ?? ""} sectionRef={sectionRef} className={styles.root}>
+    <StackSection id="competition" theme="dark" label={sectionTitle("competition")} sectionRef={sectionRef} className={styles.root}>
       <div className={styles.inner}>
         <p className={styles.eyebrow}>{competition.eyebrow}</p>
         <h2 className={styles.title}>{competition.title}</h2>

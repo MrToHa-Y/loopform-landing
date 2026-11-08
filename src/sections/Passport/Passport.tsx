@@ -6,6 +6,7 @@ import { useSectionProgress } from "@/animation/useSectionProgress"
 import { MagneticButton } from "@/components/MagneticButton/MagneticButton"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Passport.module.scss"
 
@@ -66,7 +67,7 @@ export function Passport() {
     <StackSection
       id="passport"
       theme="dark"
-      label={ru.sections[7]?.title ?? ""}
+      label={sectionTitle("passport")}
       heightVh={sectionHeights.passport}
       overlap
       sectionRef={sectionRef}

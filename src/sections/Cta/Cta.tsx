@@ -3,6 +3,7 @@ import type { FormEvent } from "react"
 import { MagneticButton } from "@/components/MagneticButton/MagneticButton"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import type { CtaField } from "@/content/types"
 import styles from "./Cta.module.scss"
 
@@ -36,7 +37,7 @@ export function Cta() {
   }
 
   return (
-    <StackSection id="cta" theme="light" label={ru.sections[16]?.title ?? ""} className={styles.root}>
+    <StackSection id="cta" theme="light" label={sectionTitle("cta")} className={styles.root}>
       <div className={styles.inner}>
         <h2 className={styles.title}>{cta.title}</h2>
         <form className={styles.form} noValidate onSubmit={handleSubmit}>

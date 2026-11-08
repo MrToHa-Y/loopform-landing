@@ -3,6 +3,7 @@ import { sectionHeights } from "@/animation/tokens"
 import { useSectionProgress } from "@/animation/useSectionProgress"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import styles from "./Melt.module.scss"
 
 export function Melt() {
@@ -15,9 +16,8 @@ export function Melt() {
     <StackSection
       id="melt"
       theme="dark"
-      label={ru.sections[5]?.title ?? ""}
+      label={sectionTitle("melt")}
       heightVh={sectionHeights.melt}
-      overlap
       sectionRef={sectionRef}
       className={styles.root}
       stickyClassName={styles.stage}

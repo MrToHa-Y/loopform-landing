@@ -45,6 +45,8 @@ export const loadState = {
 
 export const thumbnails = new Map<string, string>()
 
+export const productViews = new Map<string, string[]>()
+
 interface ScrollState {
   fontsReady: boolean
   layoutReady: boolean
@@ -58,6 +60,7 @@ interface ScrollState {
   activeModel: number
   collectionActive: boolean
   thumbnailsVersion: number
+  catalogViewsWanted: boolean
   footerActive: boolean
   presentationMode: boolean
   presentationFrame: number
@@ -80,6 +83,7 @@ export const useScrollStore = create<ScrollState>((set) => ({
   activeModel: 0,
   collectionActive: false,
   thumbnailsVersion: 0,
+  catalogViewsWanted: false,
   footerActive: false,
   presentationMode: false,
   presentationFrame: 0,
@@ -87,10 +91,9 @@ export const useScrollStore = create<ScrollState>((set) => ({
   configurator: {
     model: "tolqyn",
     color: "cap-red",
-    height: "dining",
     texture: "relief",
-    cushion: "none",
     angle: 0,
+    variants: { height: "dining", cushion: "none" },
   },
   set: (partial) => set(partial),
   setConfigurator: (partial) => set((state) => ({ configurator: { ...state.configurator, ...partial } })),

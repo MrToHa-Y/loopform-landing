@@ -1,12 +1,12 @@
 import { Vector3 } from "three"
 import type { BufferGeometry } from "three"
-import type { CatalogModelId } from "@/content/types"
+import type { CatalogModelId, VariantGroupId, VariantSelection } from "@/content/types"
 import type { PaletteToken } from "@/three/palette"
 import { createBenchGeometry, createPlanterGeometry, createScreenGeometry, createShelfGeometry, createTableParts } from "./proceduralCatalog"
 import { createChairParts } from "./proceduralChair"
 import { createLampGeometry } from "./proceduralLamp"
 import { createLoungeParts } from "./proceduralLounge"
-import { createBarStoolGeometry, createStoolGeometry } from "./proceduralStool"
+import { createBarStoolParts, createStoolParts } from "./proceduralStool"
 
 export interface ModelLook {
   color: PaletteToken
@@ -31,7 +31,7 @@ type Built = { main: BufferGeometry; cushion?: BufferGeometry; top?: BufferGeome
 
 const speckleLook = { glow: false } as const
 
-const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = {
+const models: Record<CatalogModelId, { build: (options: VariantSelection) => Built; shape?: VariantGroupId[]; look: ModelLook }> = {
   tolqyn: {
     build: createChairParts,
     look: {
@@ -46,7 +46,8 @@ const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = 
     },
   },
   tas: {
-    build: () => ({ main: createStoolGeometry() }),
+    build: (options) => createStoolParts(options.shape),
+    shape: ["shape"],
     look: {
       ...speckleLook,
       color: "pine",
@@ -59,7 +60,7 @@ const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = 
     },
   },
   biik: {
-    build: () => ({ main: createBarStoolGeometry() }),
+    build: createBarStoolParts,
     look: {
       ...speckleLook,
       color: "cap-blue",
@@ -124,7 +125,8 @@ const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = 
     },
   },
   saiabaq: {
-    build: () => ({ main: createBenchGeometry() }),
+    build: (options) => ({ main: createBenchGeometry(options.arch) }),
+    shape: ["arch"],
     look: {
       ...speckleLook,
       color: "brick",
@@ -137,7 +139,8 @@ const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = 
     },
   },
   ornek: {
-    build: () => ({ main: createScreenGeometry() }),
+    build: (options) => ({ main: createScreenGeometry(options.fold) }),
+    shape: ["fold"],
     look: {
       ...speckleLook,
       color: "clay",
@@ -150,7 +153,8 @@ const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = 
     },
   },
   uya: {
-    build: () => ({ main: createShelfGeometry() }),
+    build: (options) => ({ main: createShelfGeometry(options.modules, options.orientation) }),
+    shape: ["modules", "orientation"],
     look: {
       ...speckleLook,
       color: "mustard",
@@ -164,17 +168,22 @@ const models: Record<CatalogModelId, { build: () => Built; look: ModelLook }> = 
   },
 }
 
-const cache = new Map<CatalogModelId, ModelParts>()
+const cache = new Map<string, ModelParts>()
 
-export function getModelParts(id: CatalogModelId): ModelParts {
-  const cached = cache.get(id)
+export function shapeKey(id: CatalogModelId, options: VariantSelection = {}) {
+  return [id, ...(models[id].shape ?? []).map((group) => options[group] ?? "")].join(":")
+}
+
+export function getModelParts(id: CatalogModelId, options: VariantSelection = {}): ModelParts {
+  const key = shapeKey(id, options)
+  const cached = cache.get(key)
 
   if (cached) {
     return cached
   }
 
   const { build, look } = models[id]
-  const built = build()
+  const built = build(options)
   const box = built.main.boundingBox
 
   if (!box) {
@@ -189,7 +198,7 @@ export function getModelParts(id: CatalogModelId): ModelParts {
     look,
   }
 
-  cache.set(id, parts)
+  cache.set(key, parts)
 
   return parts
 }

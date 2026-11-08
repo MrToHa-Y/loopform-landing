@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from "react"
 import { Color, MathUtils } from "three"
 import type { Group } from "three"
 import { ru } from "@/content/ru"
-import type { CatalogModelId } from "@/content/types"
+import type { CatalogModelId, VariantSelection } from "@/content/types"
 import { useScrollStore } from "@/state/scrollStore"
 import { actorModels, actorTargets } from "@/three/actors"
 import type { ActorId } from "@/three/actors"
@@ -15,6 +15,7 @@ import { paletteColor } from "@/three/palette"
 interface ActorProps {
   id: ActorId
   model?: CatalogModelId
+  options?: VariantSelection
 }
 
 const terrazzoSpeckle = 0.3
@@ -22,9 +23,9 @@ const stretchLimit = 75 / 45
 const colorDamping = 7
 const stateDamping = 5
 
-export function Actor({ id, model: modelOverride }: ActorProps) {
+export function Actor({ id, model: modelOverride, options }: ActorProps) {
   const model = modelOverride ?? actorModels[id]
-  const parts = getModelParts(model)
+  const parts = getModelParts(model, options)
   const groupRef = useRef<Group>(null)
   const pivotRef = useRef<Group>(null)
   const initialized = useRef(false)
@@ -119,11 +120,15 @@ export function Actor({ id, model: modelOverride }: ActorProps) {
       uniforms.uRelief.value = MathUtils.damp(uniforms.uRelief.value, config.texture === "relief" ? 1 : 0.3, stateDamping, delta)
       uniforms.uLegStretch.value = MathUtils.damp(
         uniforms.uLegStretch.value,
-        model === "tolqyn" && config.height === "bar" ? stretchLimit : 1,
+        config.variants.height === "bar" ? stretchLimit : 1,
         stateDamping,
         delta,
       )
       stretch = uniforms.uLegStretch.value
+
+      if (parts.look.glow) {
+        uniforms.uGlow.value = MathUtils.damp(uniforms.uGlow.value, config.variants.light === "off" ? 0 : 1, stateDamping, delta)
+      }
     }
 
     const extraHeight = uniforms.uSeatY.value * (stretch - 1)
@@ -145,19 +150,21 @@ export function Actor({ id, model: modelOverride }: ActorProps) {
   })
 
   const cushionVisible = useScrollStore((state) =>
-    cushionVisibleByDefault || (isConfigurator && state.configurator.cushion === "felt"),
+    isConfigurator ? state.configurator.variants.cushion === "felt" : cushionVisibleByDefault,
   )
+  const printedTop = useScrollStore((state) => isConfigurator && state.configurator.variants.top === "printed")
 
   return (
     <group ref={groupRef} visible={false}>
       <group ref={pivotRef}>
         <ProductModel
           model={model}
+          options={options}
           material={bundle.material}
           depthMaterial={bundle.depthMaterial}
           cushionMaterial={cushionBundle?.material ?? null}
           cushionVisible={cushionVisible}
-          topMaterial={topBundle?.material ?? null}
+          topMaterial={printedTop ? bundle.material : (topBundle?.material ?? null)}
           castShadow={id === "tolqyn" || id === "configChair"}
         />
       </group>

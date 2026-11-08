@@ -6,6 +6,7 @@ import { Counter } from "@/components/Counter/Counter"
 import { SplitLines } from "@/components/SplitLines/SplitLines"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Problem.module.scss"
 
@@ -49,7 +50,7 @@ export function Problem() {
     <StackSection
       id="problem"
       theme="dark"
-      label={ru.sections[4]?.title ?? ""}
+      label={sectionTitle("problem")}
       heightVh={sectionHeights.problem}
       sectionRef={sectionRef}
       className={styles.root}

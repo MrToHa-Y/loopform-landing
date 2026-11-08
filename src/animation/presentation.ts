@@ -53,11 +53,6 @@ export function buildFrames() {
     add("problem", problem + vh(points.problemHeap))
     add("problem", problem + vh(points.problemShape))
 
-    const melt = sectionTop("melt")
-
-    add("melt", melt)
-    add("melt", melt + vh(points.meltDeep))
-
     const process = sectionTop("process")
 
     for (let step = 0; step < points.processSteps; step += 1) {
@@ -70,12 +65,18 @@ export function buildFrames() {
       add("passport", passport + vh((points.passportSpan * (step + 0.5)) / points.passportItems))
     }
   } else {
-    const ids: SectionId[] = ["hero", "collection", "catalog", "problem", "melt", "process", "passport"]
+    const ids: SectionId[] = ["hero", "collection", "catalog", "problem", "process", "passport"]
     ids.forEach((id) => add(id, sectionTop(id)))
   }
 
-  const tail: SectionId[] = ["configurator", "manifesto", "philosophy", "advantages", "business", "market", "competition", "faq", "cta"]
-  tail.forEach((id) => add(id, sectionTop(id)))
+  const tail: SectionId[] = ["configurator", "manifesto", "philosophy", "melt", "advantages", "business", "market", "competition", "faq", "cta"]
+  tail.forEach((id) => {
+    add(id, sectionTop(id))
+
+    if (id === "melt" && detailed) {
+      add(id, sectionTop(id) + vh(points.meltDeep))
+    }
+  })
 
   frames.push({
     y: document.documentElement.scrollHeight - window.innerHeight,

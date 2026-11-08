@@ -3,6 +3,7 @@ import { gsap, useGSAP } from "@/animation/gsap"
 import { durations, eases, sectionHeights, staggers } from "@/animation/tokens"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Philosophy.module.scss"
 
@@ -35,7 +36,7 @@ export function Philosophy() {
     <StackSection
       id="philosophy"
       theme="dark"
-      label={ru.sections[10]?.title ?? ""}
+      label={sectionTitle("philosophy")}
       overlap
       sectionRef={sectionRef}
       className={styles.root}

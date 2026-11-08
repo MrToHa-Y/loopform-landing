@@ -2,13 +2,14 @@ import { Accordion } from "@/components/Accordion/Accordion"
 import { SplitLines } from "@/components/SplitLines/SplitLines"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import styles from "./Faq.module.scss"
 
 export function Faq() {
   const { faq } = ru
 
   return (
-    <StackSection id="faq" theme="light" label={ru.sections[15]?.title ?? ""} className={styles.root}>
+    <StackSection id="faq" theme="light" label={sectionTitle("faq")} className={styles.root}>
       <div className={styles.inner}>
         <div className={styles.head}>
           <p className={styles.eyebrow}>{faq.eyebrow}</p>

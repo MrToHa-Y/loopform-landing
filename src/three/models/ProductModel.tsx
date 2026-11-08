@@ -2,13 +2,14 @@ import { useGLTF } from "@react-three/drei"
 import { useMemo } from "react"
 import { Box3, Vector3 } from "three"
 import type { Material, Mesh, Object3D } from "three"
-import type { CatalogModelId } from "@/content/types"
+import type { CatalogModelId, VariantSelection } from "@/content/types"
 import { getModelParts } from "@/three/models/modelLibrary"
 import { withHeightLayers } from "@/three/models/geometryUtils"
 import { availableModels } from "@/three/models/modelAvailability"
 
 interface ProductModelProps {
   model: CatalogModelId
+  options?: VariantSelection
   material: Material
   depthMaterial: Material
   cushionMaterial: Material | null
@@ -55,8 +56,8 @@ function GltfModel({ path, height, material, depthMaterial }: GltfModelProps) {
   return <primitive object={prepared} />
 }
 
-export function ProductModel({ model, material, depthMaterial, cushionMaterial, cushionVisible, topMaterial, castShadow }: ProductModelProps) {
-  const parts = getModelParts(model)
+export function ProductModel({ model, options, material, depthMaterial, cushionMaterial, cushionVisible, topMaterial, castShadow }: ProductModelProps) {
+  const parts = getModelParts(model, options)
   const path = availableModels.get(model)
 
   if (path) {

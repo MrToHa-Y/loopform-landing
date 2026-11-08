@@ -3,6 +3,7 @@ import { gsap, useGSAP } from "@/animation/gsap"
 import { durations, eases, staggers } from "@/animation/tokens"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Advantages.module.scss"
 
@@ -32,7 +33,15 @@ export function Advantages() {
   )
 
   return (
-    <StackSection id="advantages" theme="light" label={ru.sections[11]?.title ?? ""} sectionRef={sectionRef} className={styles.root}>
+    <StackSection
+      id="advantages"
+      theme="light"
+      label={sectionTitle("advantages")}
+      overlap
+      sectionRef={sectionRef}
+      className={styles.root}
+      leading={<div data-anchor="advantages-top" className={styles.seam} aria-hidden="true" />}
+    >
       <div className={styles.inner}>
         <p className={styles.eyebrow}>{advantages.eyebrow}</p>
         <h2 className={styles.title}>{advantages.title}</h2>

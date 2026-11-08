@@ -7,6 +7,7 @@ import { FitText } from "@/components/FitText/FitText"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { productPhotos } from "@/content/images"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import type { CollectionModel } from "@/content/types"
 import { collectionRig, thumbnails, useScrollStore } from "@/state/scrollStore"
 import { readColor } from "@/styles/readToken"
@@ -222,7 +223,7 @@ export function Collection() {
       <StackSection
         id="collection"
         theme="accent"
-        label={ru.sections[2]?.title ?? ""}
+        label={sectionTitle("collection")}
         overlap
         sectionRef={sectionRef}
         className={styles.stackedRoot}
@@ -252,7 +253,7 @@ export function Collection() {
     <StackSection
       id="collection"
       theme="accent"
-      label={ru.sections[2]?.title ?? ""}
+      label={sectionTitle("collection")}
       heightVh={sectionHeights.collection}
       overlap
       sectionRef={sectionRef}

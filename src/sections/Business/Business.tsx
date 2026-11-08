@@ -6,6 +6,7 @@ import { MagneticButton } from "@/components/MagneticButton/MagneticButton"
 import { SplitLines } from "@/components/SplitLines/SplitLines"
 import { StackSection } from "@/components/StackSection/StackSection"
 import { ru } from "@/content/ru"
+import { sectionTitle } from "@/content/sectionTitle"
 import { useScrollStore } from "@/state/scrollStore"
 import styles from "./Business.module.scss"
 
@@ -71,7 +72,7 @@ export function Business() {
     <StackSection
       id="business"
       theme="accent"
-      label={ru.sections[12]?.title ?? ""}
+      label={sectionTitle("business")}
       sectionRef={sectionRef}
       className={styles.root}
     >

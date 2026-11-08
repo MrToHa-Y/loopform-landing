@@ -125,18 +125,25 @@ function line(fromX: number, fromY: number, toX: number, toY: number, steps: num
   return points
 }
 
-function benchContour() {
+function benchContour(solid: boolean) {
   const half = benchWidth / 2
   const inner = half - benchWall
   const shoulderY = benchHeight - benchShoulder
   const archY = benchArchTop - inner
-
-  return [
+  const outline = [
     ...line(half, 0, half, shoulderY, 14, 1, 0),
     ...arc(half - benchShoulder, shoulderY, benchShoulder, 0, Math.PI / 2, 36, false),
     ...line(half - benchShoulder, benchHeight, -half + benchShoulder, benchHeight, 6, 0, 1),
     ...arc(-half + benchShoulder, shoulderY, benchShoulder, Math.PI / 2, Math.PI, 36, false),
     ...line(-half, shoulderY, -half, 0, 14, -1, 0),
+  ]
+
+  if (solid) {
+    return [...outline, ...line(-half, 0, half, 0, 12, 0, -1)]
+  }
+
+  return [
+    ...outline,
     ...line(-half, 0, -inner, 0, 3, 0, -1),
     ...line(-inner, 0, -inner, archY, 12, 1, 0),
     ...arc(0, archY, inner, Math.PI, 0, 48, true),
@@ -194,8 +201,8 @@ function createBenchCap(contour: ContourPoint[], inset: number, z: number, facin
   return cap
 }
 
-export function createBenchGeometry() {
-  const contour = benchContour()
+export function createBenchGeometry(opening = "arch") {
+  const contour = benchContour(opening === "solid")
   const edgeRows = 6
   const stations: { z: number; inset: number }[] = []
 
@@ -280,8 +287,14 @@ function createPanel(startX: number, startZ: number, heading: number) {
   return withHeightLayers(panel)
 }
 
-export function createScreenGeometry() {
-  const headings = [-0.22, 0.64, -0.2]
+const screenFolds: Record<string, readonly number[]> = {
+  zigzag: [-0.22, 0.64, -0.2],
+  corner: [-0.1, 1.2, 1.2],
+  flat: [0, 0, 0],
+}
+
+export function createScreenGeometry(fold = "zigzag") {
+  const headings = screenFolds[fold] ?? screenFolds.zigzag ?? []
   const panels: BufferGeometry[] = []
   let x = 0
   let z = 0
@@ -300,13 +313,13 @@ const cellWall = 0.036
 const cellDepth = 0.2
 const cellGap = 0.003
 
-function createHexCell(x: number, y: number) {
+function createHexCell(x: number, y: number, turn: number) {
   const inner = cellRadius - cellWall / Math.cos(Math.PI / 6)
   const outline = new Shape()
   const hole = new Path()
 
   for (let index = 0; index < 6; index += 1) {
-    const angle = (index / 6) * Math.PI * 2 + Math.PI / 6
+    const angle = (index / 6) * Math.PI * 2 + turn
     const px = x + Math.cos(angle) * cellRadius
     const py = y + Math.sin(angle) * cellRadius
     const hx = x + Math.cos(angle) * inner
@@ -328,15 +341,33 @@ function createHexCell(x: number, y: number) {
   return withHeightLayers(new ExtrudeGeometry(outline, { depth: cellDepth, bevelEnabled: false }))
 }
 
-export function createShelfGeometry() {
-  const half = (cellRadius * Math.sqrt(3)) / 2 + cellGap
+const pointySlots: readonly (readonly [number, number])[] = [
+  [-0.5, 0],
+  [0.5, 0],
+  [0, 1],
+  [1.5, 0],
+  [1, 1],
+  [0.5, 2],
+]
+
+const flatSlots: readonly (readonly [number, number])[] = [
+  [0, 0],
+  [1, 0.5],
+  [0, 1],
+  [2, 0],
+  [2, 1],
+  [1, 1.5],
+]
+
+export function createShelfGeometry(modules = "3", orientation = "pointy") {
+  const count = Math.min(Math.max(Number(modules) || 3, 1), pointySlots.length)
+  const flat = orientation === "flat"
+  const across = flat ? cellRadius * 1.5 + cellGap : cellRadius * Math.sqrt(3) + cellGap
+  const rise = flat ? cellRadius * Math.sqrt(3) + cellGap : cellRadius * 1.5 + cellGap
+  const slots = (flat ? flatSlots : pointySlots).slice(0, count)
 
   return finishGeometry(
-    mergeParts([
-      createHexCell(-half, cellRadius),
-      createHexCell(half, cellRadius),
-      createHexCell(0, cellRadius * 2.5 + cellGap * 2),
-    ]),
+    mergeParts(slots.map(([column, row]) => createHexCell(column * across, row * rise, flat ? 0 : Math.PI / 6))),
     0.5,
   )
 }

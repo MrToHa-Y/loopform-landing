@@ -133,7 +133,7 @@ $layers: (
   "collection": 6,
   "catalog": 7,
   "problem": 8,
-  "melt": 9,
+  "melt": 13,
   "process": 10,
   "passport": 11,
   "configurator": 12,
@@ -199,6 +199,8 @@ $layers: (
     --button-padding-small: 0.625rem 0.875rem;
     --field-height: 2.75rem;
     --mobile-dock: 5.5rem;
+    --process-copy-mobile: 12.5rem;
+    --catalog-gap: clamp(0.75rem, 1.6vw, 1.75rem);
 
     @each $name, $value in $radii {
       --radius-#{$name}: #{$value};

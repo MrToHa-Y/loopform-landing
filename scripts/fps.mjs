@@ -25,24 +25,26 @@ const renderer = await page.evaluate(() => {
 
 console.log("renderer", renderer)
 
-for (const [name, from, to] of [
-  ["hero", 40, 190],
-  ["collection", 205, 590],
-  ["problem", 830, 980],
-  ["melt", 1090, 1300],
-  ["process", 1380, 1580],
-  ["passport", 1680, 1810],
-  ["configurator", 1880, 1960],
-  ["text", 2300, 2800],
-  ["footer", -170, -100],
+for (const [name, section, from, to] of [
+  ["hero", "hero", 40, 190],
+  ["collection", "collection", 5, 390],
+  ["problem", "problem", 0, 150],
+  ["process", "process", 0, 200],
+  ["passport", "passport", 0, 130],
+  ["configurator", "configurator", 0, 80],
+  ["melt", "melt", -20, 300],
+  ["text", "advantages", 0, 300],
+  ["footer", null, -170, -100],
 ]) {
   const fps = await page.evaluate(
-    async ([startVh, endVh]) => {
+    async ([sectionId, startVh, endVh]) => {
       const height = window.innerHeight
       const lenis = window.__lenis
       const total = (document.documentElement.scrollHeight / height) * 100
-      const fromVh = startVh < 0 ? total + startVh : startVh
-      const toVh = endVh < 0 ? total + endVh : endVh
+      const element = sectionId ? document.querySelector(`[data-section='${sectionId}']`) : null
+      const base = element ? ((element.getBoundingClientRect().top + window.scrollY) / height) * 100 : 0
+      const fromVh = sectionId ? base + startVh : total + startVh
+      const toVh = sectionId ? base + endVh : total + endVh
 
       lenis.scrollTo((fromVh / 100) * height, { immediate: true, force: true })
       await new Promise((resolve) => setTimeout(resolve, 500))
@@ -76,7 +78,7 @@ for (const [name, from, to] of [
         p95ms: Math.round(sorted[Math.floor(sorted.length * 0.95)]),
       }
     },
-    [from, to],
+    [section, from, to],
   )
 
   console.log(name, JSON.stringify(fps))

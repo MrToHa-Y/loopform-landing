@@ -42,21 +42,22 @@ export type ThemeName = "light" | "dark" | "accent"
 
 export type ConfiguratorColorId = "cap-red" | "bottle-green" | "sand" | "cap-blue" | "sun" | "terrazzo"
 
-export type ConfiguratorHeightId = "dining" | "bar"
-
 export type ConfiguratorTextureId = "smooth" | "relief"
 
-export type ConfiguratorCushionId = "none" | "felt"
+export type VariantGroupId = "height" | "cushion" | "shape" | "top" | "light" | "size" | "arch" | "fold" | "modules" | "orientation"
 
-export type ConfiguratorGroupId = "model" | "color" | "height" | "texture" | "cushion" | "angle"
+export type ConfiguratorBaseGroupId = "model" | "color" | "texture" | "angle"
+
+export type ConfiguratorGroupId = ConfiguratorBaseGroupId | VariantGroupId
+
+export type VariantSelection = Partial<Record<VariantGroupId, string>>
 
 export interface ConfiguratorState {
   model: CatalogModelId
   color: ConfiguratorColorId
-  height: ConfiguratorHeightId
   texture: ConfiguratorTextureId
-  cushion: ConfiguratorCushionId
   angle: number
+  variants: VariantSelection
 }
 
 export interface SectionEntry {
@@ -211,9 +212,20 @@ export interface ConfiguratorColor extends ConfiguratorOption<ConfiguratorColorI
   token: ColorToken
 }
 
-export interface ConfiguratorHeight extends ConfiguratorOption<ConfiguratorHeightId> {
-  heightCm: number
-  weightKg: number
+export interface VariantChoice {
+  id: string
+  label: string
+  priceValue?: number
+  weightKg?: number
+}
+
+export interface VariantGroup {
+  id: VariantGroupId
+  label: string
+  tab: string
+  rebuild: boolean
+  defaultId?: string
+  choices: VariantChoice[]
 }
 
 export interface ConfiguratorModel {
@@ -222,20 +234,17 @@ export interface ConfiguratorModel {
   priceValue: number
   pricePrefix: string
   weightKg: number
-  fromCaps: boolean
   color: ConfiguratorColorId
-  adjustable: boolean
+  variants: VariantGroup[]
 }
 
 export interface Configurator {
   titlePrefix: string
-  groups: Record<ConfiguratorGroupId, string>
-  tabs: Record<ConfiguratorGroupId, string>
+  groups: Record<ConfiguratorBaseGroupId, string>
+  tabs: Record<ConfiguratorBaseGroupId, string>
   models: ConfiguratorModel[]
   colors: ConfiguratorColor[]
-  heights: ConfiguratorHeight[]
   textures: ConfiguratorOption<ConfiguratorTextureId>[]
-  cushions: ConfiguratorOption<ConfiguratorCushionId>[]
   angle: {
     min: number
     max: number
@@ -371,8 +380,15 @@ export interface Catalog {
   note: string
   buyLabel: string
   buyUrl: string
-  previousLabel: string
-  nextLabel: string
+  preview: {
+    hoverHint: string
+    tapHint: string
+    openLabel: string
+    closeLabel: string
+    photoLabel: string
+    modelLabel: string
+    specs: Record<"size" | "material" | "weight" | "printTime" | "caps", string>
+  }
   items: CatalogItem[]
 }
 
